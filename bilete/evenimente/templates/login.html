@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Autentificare | Bilete Online{% endblock %}
+
+{% block content %}cd
+<div class="container mt-5">
+    <h2 class="text-center">Autentifică-te în contul tău</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <!-- Afișează mesajele de eroare pentru formular -->
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <ul>
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <!-- Câmpul pentru email -->
+        <div class="mb-3">
+            <label for="email" class="form-label">Adresă de email</label>
+            {{ form.username }} <!-- Afișează câmpul email din formular -->
+        </div>
+
+        <!-- Câmpul pentru parolă -->
+        <div class="mb-3">
+            <label for="password" class="form-label">Parolă</label>
+            {{ form.password }} <!-- Afișează câmpul parolă din formular -->
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Autentifică-te</button>
+    </form>
+
+    <p class="mt-3 text-center">Nu ai un cont? <a href="{% url 'register' %}">Înregistrează-te aici</a></p>
+</div>
+{% endblock %}
+
+
+
+
+

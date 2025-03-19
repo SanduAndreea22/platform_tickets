@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Contactează-ne{% endblock %}
+
+{% block content %}
+    <style>
+        /* Stiluri generale pentru secțiunea Contactează-ne */
+        .contact-container {
+            margin-top: 50px;
+            margin-bottom: 50px;
+        }
+
+        .contact-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .contact-header h1 {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .contact-header p {
+            font-size: 1.2em;
+            color: #7f8c8d;
+        }
+
+        .contact-info {
+            background-color: #f4f6f7;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .contact-info ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .contact-info li {
+            font-size: 1.1em;
+            color: #34495e;
+            line-height: 1.6;
+        }
+
+        .contact-info a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+    </style>
+
+    <section class="contact-container container">
+        <div class="contact-header">
+            <h1>Contactează-ne</h1>
+            <p>Dacă ai nevoie de ajutor sau vrei să ne contactezi, poți folosi informațiile de mai jos:</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="contact-info">
+                    <ul>
+                        <li><strong>Email:</strong> <a href="mailto:support@eventticket.ro">support@eventticket.ro</a></li>
+                        <li><strong>Telefon:</strong> +40 123 456 789</li>
+                        <li><strong>Adresă:</strong> Strada Exemplu, Nr. 123, București, România</li>
+                    </ul>
+
+                    <p>De asemenea, ne poți contacta și prin rețelele sociale:</p>
+                    <ul>
+                        <li><strong>Facebook:</strong> <a href="https://www.facebook.com/eventticket" target="_blank">Facebook EventTicket</a></li>
+                        <li><strong>Instagram:</strong> <a href="https://www.instagram.com/eventticket" target="_blank">Instagram EventTicket</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+

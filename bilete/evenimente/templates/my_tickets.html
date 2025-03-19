@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Biletele Mele</h1>
+
+    <!-- Butonul pentru biletele mele -->
+    <div class="mb-4">
+        <a href="{% url 'my_tickets' %}" class="btn btn-success">Biletele Mele</a>
+    </div>
+
+    <!-- Verifică dacă utilizatorul are bilete -->
+    {% if tickets %}
+        <ul>
+            {% for ticket in tickets %}
+                <li>
+                    <p><strong>Eveniment:</strong> {{ ticket.event.name }}</p>
+                    <p><strong>Tip bilet:</strong> {{ ticket.ticket_type }}</p>
+                    <p><strong>Preț:</strong> {{ ticket.apply_discount|floatformat:2 }} lei</p>
+                    <p><strong>Status plată:</strong> {{ ticket.payment_status }}</p>
+                    <img src="{{ ticket.qr_code.url }}" alt="QR code pentru check-in">
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Nu aveți bilete achiziționate.</p>
+    {% endif %}
+{% endblock %}
+
+

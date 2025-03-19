@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Rezultate Căutare</h1>
+
+    <form method="get" action="{% url 'search_results' %}">
+        <input type="text" name="q" value="{{ search_query }}" placeholder="Căutare evenimente">
+        <button type="submit">Căutare</button>
+    </form>
+
+    <ul>
+        {% for event in events %}
+            <li>
+                <h2><a href="{% url 'event_detail' event.id %}">{{ event.name }}</a></h2>
+                <p><strong>Data și ora:</strong> {{ event.date|date:"d-m-Y H:i" }}</p>
+                <p><strong>Locație:</strong> {{ event.location }}</p>
+                <p><strong>Categorie:</strong> {{ event.category }}</p>
+            </li>
+        {% empty %}
+            <p>Nu au fost găsite evenimente pentru căutarea dvs.</p>
+        {% endfor %}
+    </ul>
+{% endblock %}
+

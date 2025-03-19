@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Despre noi{% endblock %}
+
+{% block content %}
+    <style>
+        /* Stiluri pentru întreaga secțiune Despre Noi */
+        .despre-noi-container {
+            margin-top: 50px;
+            margin-bottom: 50px;
+        }
+
+        .despre-noi-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .despre-noi-header h1 {
+            font-size: 3em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .despre-noi-header p {
+            font-size: 1.2em;
+            color: #7f8c8d;
+        }
+
+        .despre-noi-content {
+            background-color: #f4f6f7;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .despre-noi-content p {
+            font-size: 1.1em;
+            color: #34495e;
+            line-height: 1.6;
+        }
+
+        .despre-noi-content p strong {
+            color: #2980b9;
+        }
+    </style>
+
+    <section class="despre-noi-container container">
+        <div class="despre-noi-header">
+            <h1>Despre Noi</h1>
+            <p>Bine ai venit pe platforma noastră de bilete online!</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="despre-noi-content">
+                    <p>Aici poți găsi cele mai bune evenimente și bilete pentru spectacole, concerte și multe altele.</p>
+                    <p>Suntem dedicați să îți oferim o experiență rapidă și ușoară pentru achiziționarea biletelor tale. Echipa noastră lucrează constant pentru a adăuga noi evenimente și pentru a îmbunătăți serviciile oferite.</p>
+                    <p>Mulțumim că ne-ai ales!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+

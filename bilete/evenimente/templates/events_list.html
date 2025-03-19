@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Toate Evenimentele</h1>
+
+    <form method="get" action="{% url 'events_list' %}">
+        <label for="category">Categorie:</label>
+        <select name="category" id="category">
+            <option value="">Toate categoriile</option>
+            {% for category in categories %}
+                <option value="{{ category }}" {% if category == selected_category %}selected{% endif %}>{{ category }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="location">Locație:</label>
+        <input type="text" name="location" value="{{ selected_location }}">
+
+        <label for="date">Dată:</label>
+        <input type="date" name="date" value="{{ selected_date }}">
+
+        <button type="submit">Filtrează</button>
+    </form>
+
+    <ul>
+        {% for event in events %}
+            <li>
+                <h2><a href="{% url 'event_detail' event.id %}">{{ event.name }}</a></h2>
+                <p><strong>Data și Ora:</strong> {{ event.date|date:"d-m-Y H:i" }}</p>
+                <p><strong>Locație:</strong> {{ event.location }}</p>
+                <p><strong>Categorie:</strong> {{ event.category }}</p>
+                <p><strong>Bilete disponibile:</strong> {{ event.available_tickets }}</p>
+                <p><a href="{% url 'event_detail' event.id %}">Vezi detalii</a></p>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <div class="pagination">
+        {% for i in events.paginator.page_range %}
+            <a href="?page={{ i }}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_location %}&location={{ selected_location }}{% endif %}{% if selected_date %}&date={{ selected_date }}{% endif %}">{{ i }}</a>
+        {% endfor %}
+    </div>
+
+{% endblock %}
+

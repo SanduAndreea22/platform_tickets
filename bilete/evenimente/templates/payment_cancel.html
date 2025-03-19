@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Plata a fost anulată</h1>
+    <p>Nu am reușit să procesăm plata. Te rugăm să încerci din nou.</p>
+    <a href="{% url 'events_list' %}">Întoarce-te la evenimente</a>
+{% endblock %}

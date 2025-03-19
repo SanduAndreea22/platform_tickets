@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Vânzare de Bilete & Check-in</h1>
+<h2>Eveniment: {{ event.name }}</h2>
+
+<h3>Bilete Disponibile</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Tip Bilet</th>
+            <th>Preț</th>
+            <th>Acțiuni</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ticket in tickets %}
+            <tr>
+                <td>{{ ticket.ticket_type }}</td>
+                <td>{{ ticket.price }}</td>
+                <td><a href="#">Modifică</a></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h3>Adaugă un Bilet Nou</h3>
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Adaugă Bilet</button>
+</form>
+{% endblock %}

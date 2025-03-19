@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Personalizare Eveniment</h1>
+<form method="POST">
+    {% csrf_token %}
+    <label for="theme">Temă:</label>
+    <input type="text" name="theme" value="{{ event.theme }}">
+    
+    <label for="decorations">Decoruri:</label>
+    <input type="text" name="decorations" value="{{ event.decorations }}">
+    
+    <label for="playlist">Playlist:</label>
+    <input type="text" name="playlist" value="{{ event.playlist }}">
+    
+    <button type="submit">Salvează Personalizările</button>
+</form>
+{% endblock %}
