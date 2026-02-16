@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}TicketPlatform{% endblock %}</title>
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Global CSS -->
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <a href="{% url 'pages:home' %}" class="brand-link">
+        <img src="{% static 'events/img/logo.png' %}" alt="Logo" class="brand-logo">
+        <strong class="brand-name">TicketPlatform</strong>
+      </a>
+    </div>
+
+    <button id="menuToggle" class="icon-btn mobile-only" aria-label="Menu">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <nav id="navbar" class="navbar">
+      <ul id="navLinks" class="nav-links">
+
+        <li><a href="{% url 'events:events_list' %}" class="nav-link">Events</a></li>
+        <li><a href="{% url 'pages:about' %}" class="nav-link">About</a></li>
+        <li><a href="{% url 'pages:contact' %}" class="nav-link">Contact</a></li>
+        <li><a href="{% url 'pages:partners' %}" class="nav-link">Partners</a></li>
+        <li><a href="{% url 'pages:terms' %}" class="nav-link">Terms</a></li>
+        <li><a href="{% url 'pages:privacy' %}" class="nav-link">Privacy Policy</a></li>
+
+        {% if user.is_authenticated %}
+          {% if user.is_organizer %}
+            <li><a href="{% url 'events:my_events' %}" class="nav-link">📋 My Events</a></li>
+            <li><a href="{% url 'events:create_event' %}" class="nav-link nav-primary">➕ Create Event</a></li>
+          {% elif user.is_participant %}
+            <li><a href="{% url 'events:my_tickets' %}" class="nav-link">🎟️ My Tickets</a></li>
+            <li><a href="{% url 'events:my_reservations' %}" class="nav-link">📅 My Reservations</a></li>
+          {% endif %}
+
+          <li class="dropdown" id="userDropdown">
+            <button class="dropdown-btn" type="button">
+              <i class="fa fa-user"></i> {{ user.username }}
+              <i class="fa fa-chevron-down chevron"></i>
+            </button>
+
+            <div class="dropdown-content">
+              <a href="{% url 'users:profile' %}" class="dropdown-item">
+                <i class="fa fa-id-badge"></i> Profile
+              </a>
+              <a href="{% url 'users:logout' %}" class="dropdown-item">
+                <i class="fa fa-right-from-bracket"></i> Logout
+              </a>
+            </div>
+          </li>
+
+        {% else %}
+          <li><a href="{% url 'users:login' %}" class="nav-link">Login</a></li>
+          <li><a href="{% url 'users:register' %}" class="nav-link nav-primary">Register</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+
+    <button id="themeToggle" class="icon-btn" aria-label="Toggle theme">
+      <i class="fas fa-moon"></i>
+    </button>
+  </header>
+
+  {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+        <div class="message-card">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <main class="page">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p>&copy; 2025 TicketPlatform — All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="{% static 'js/base.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

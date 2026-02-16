@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<section style="padding:10px 0 0;">
+
+  <div style="max-width:720px; margin:0 auto; background:#ffffff; border:1px solid #e5e7eb; border-radius:18px; padding:22px; box-shadow:0 10px 26px rgba(0,0,0,0.06); text-align:center;">
+
+    <div style="font-size:54px; margin-bottom:12px;">⚠️</div>
+
+    <h1 style="margin:0 0 10px; font-size:22px; font-weight:900; color:#ef4444;">
+      Payment cancelled
+    </h1>
+
+    <p style="margin:0 0 16px; color:#6b7280; line-height:1.6;">
+      Your payment was not completed. You can retry anytime from your reservations page.
+    </p>
+
+    <a href="{% url 'events:my_reservations' %}"
+       style="display:inline-block; text-decoration:none; padding:11px 14px; border-radius:14px; font-weight:900; background:#f59e0b; color:#ffffff; transition:opacity 0.2s ease;"
+       onmouseover="this.style.opacity='0.88';"
+       onmouseout="this.style.opacity='1';">
+      🔁 Back to my reservations
+    </a>
+
+  </div>
+
+</section>
+
+{% endblock %}
+
+
+

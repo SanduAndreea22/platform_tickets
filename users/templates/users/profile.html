@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}My profile - TicketPlatform{% endblock %}
+{% block content %}
+
+<section style="padding:10px 0 0;">
+
+  <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:18px; padding:18px; box-shadow:0 10px 26px rgba(0,0,0,0.06);">
+
+    <!-- Header -->
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;">
+
+      <div style="display:flex; align-items:center; gap:14px;">
+
+        <!-- Avatar -->
+        <div style="
+          width:54px; height:54px;
+          border-radius:999px;
+          background:#2563eb;
+          color:#ffffff;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          font-weight:900;
+          font-size:20px;
+          box-shadow:0 10px 22px rgba(37,99,235,0.25);
+          flex:0 0 auto;
+        ">
+          {{ user.username|first|upper }}
+        </div>
+
+        <!-- User info -->
+        <div>
+          <h2 style="margin:0; font-size:18px; font-weight:900; color:#111827; line-height:1.2;">
+            {{ user.username }}
+          </h2>
+          <p style="margin:4px 0 0; color:#6b7280; font-size:13px;">
+            {{ user.email }}
+          </p>
+
+          {% if user.is_organizer %}
+            <span style="
+              display:inline-block; margin-top:8px;
+              padding:4px 10px;
+              border-radius:999px;
+              font-size:12px;
+              font-weight:900;
+              background:rgba(37,99,235,0.12);
+              color:#2563eb;
+              border:1px solid rgba(37,99,235,0.22);
+            ">
+              🧑‍💼 Organizer
+            </span>
+          {% else %}
+            <span style="
+              display:inline-block; margin-top:8px;
+              padding:4px 10px;
+              border-radius:999px;
+              font-size:12px;
+              font-weight:900;
+              background:rgba(16,185,129,0.12);
+              color:#059669;
+              border:1px solid rgba(16,185,129,0.22);
+            ">
+              🎟️ Participant
+            </span>
+          {% endif %}
+        </div>
+
+      </div>
+
+      <!-- Logout -->
+      <form method="POST" action="{% url 'users:logout' %}" style="margin:0;">
+        {% csrf_token %}
+        <button type="submit"
+          title="Logout"
+          style="
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            width:44px;
+            height:44px;
+            border-radius:14px;
+            background:#f3f4f6;
+            border:1px solid #e5e7eb;
+            cursor:pointer;
+            transition:opacity 0.2s ease;
+          "
+          onmouseover="this.style.opacity='0.88';"
+          onmouseout="this.style.opacity='1';"
+        >
+          <i class="fa-solid fa-arrow-right-from-bracket" style="color:#111827;"></i>
+        </button>
+      </form>
+
+    </div>
+
+    <!-- Menu grid -->
+    <div style="margin-top:18px; display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:14px;">
+
+      {% if user.is_participant %}
+
+        <a href="{% url 'events:my_tickets' %}"
+           style="text-decoration:none; display:block; border:1px solid #e5e7eb; border-radius:18px; padding:16px; background:#ffffff; box-shadow:0 8px 18px rgba(0,0,0,0.05); transition:transform 0.2s ease, box-shadow 0.2s ease;"
+           onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(0,0,0,0.08)';"
+           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 18px rgba(0,0,0,0.05)';">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+            <div style="width:38px; height:38px; border-radius:14px; background:rgba(37,99,235,0.12); display:flex; align-items:center; justify-content:center;">
+              <i class="fa-solid fa-ticket" style="color:#2563eb;"></i>
+            </div>
+            <h3 style="margin:0; color:#111827; font-size:15px; font-weight:900;">My tickets</h3>
+          </div>
+          <p style="margin:0; color:#6b7280; font-size:13px; line-height:1.5;">See your purchased tickets</p>
+        </a>
+
+        <a href="{% url 'events:my_reservations' %}"
+           style="text-decoration:none; display:block; border:1px solid #e5e7eb; border-radius:18px; padding:16px; background:#ffffff; box-shadow:0 8px 18px rgba(0,0,0,0.05); transition:transform 0.2s ease, box-shadow 0.2s ease;"
+           onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(0,0,0,0.08)';"
+           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 18px rgba(0,0,0,0.05)';">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+            <div style="width:38px; height:38px; border-radius:14px; background:rgba(109,40,217,0.12); display:flex; align-items:center; justify-content:center;">
+              <i class="fa-solid fa-calendar-check" style="color:#6d28d9;"></i>
+            </div>
+            <h3 style="margin:0; color:#111827; font-size:15px; font-weight:900;">My reservations</h3>
+          </div>
+          <p style="margin:0; color:#6b7280; font-size:13px; line-height:1.5;">Manage pending & confirmed reservations</p>
+        </a>
+
+        <a href="{% url 'events:events_list' %}"
+           style="text-decoration:none; display:block; border:1px solid #e5e7eb; border-radius:18px; padding:16px; background:#ffffff; box-shadow:0 8px 18px rgba(0,0,0,0.05); transition:transform 0.2s ease, box-shadow 0.2s ease;"
+           onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(0,0,0,0.08)';"
+           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 18px rgba(0,0,0,0.05)';">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+            <div style="width:38px; height:38px; border-radius:14px; background:rgba(16,185,129,0.12); display:flex; align-items:center; justify-content:center;">
+              <i class="fa-solid fa-magnifying-glass" style="color:#059669;"></i>
+            </div>
+            <h3 style="margin:0; color:#111827; font-size:15px; font-weight:900;">Browse events</h3>
+          </div>
+          <p style="margin:0; color:#6b7280; font-size:13px; line-height:1.5;">Explore available events</p>
+        </a>
+
+      {% endif %}
+
+      {% if user.is_organizer %}
+
+        <a href="{% url 'events:my_events' %}"
+           style="text-decoration:none; display:block; border:1px solid #e5e7eb; border-radius:18px; padding:16px; background:#ffffff; box-shadow:0 8px 18px rgba(0,0,0,0.05); transition:transform 0.2s ease, box-shadow 0.2s ease;"
+           onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(0,0,0,0.08)';"
+           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 18px rgba(0,0,0,0.05)';">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+            <div style="width:38px; height:38px; border-radius:14px; background:rgba(37,99,235,0.12); display:flex; align-items:center; justify-content:center;">
+              <i class="fa-solid fa-rectangle-list" style="color:#2563eb;"></i>
+            </div>
+            <h3 style="margin:0; color:#111827; font-size:15px; font-weight:900;">My events</h3>
+          </div>
+          <p style="margin:0; color:#6b7280; font-size:13px; line-height:1.5;">Manage your events</p>
+        </a>
+
+        <a href="{% url 'events:create_event' %}"
+           style="text-decoration:none; display:block; border:1px solid #e5e7eb; border-radius:18px; padding:16px; background:#ffffff; box-shadow:0 8px 18px rgba(0,0,0,0.05); transition:transform 0.2s ease, box-shadow 0.2s ease;"
+           onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(0,0,0,0.08)';"
+           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 18px rgba(0,0,0,0.05)';">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+            <div style="width:38px; height:38px; border-radius:14px; background:rgba(109,40,217,0.12); display:flex; align-items:center; justify-content:center;">
+              <i class="fa-solid fa-circle-plus" style="color:#6d28d9;"></i>
+            </div>
+            <h3 style="margin:0; color:#111827; font-size:15px; font-weight:900;">Create event</h3>
+          </div>
+          <p style="margin:0; color:#6b7280; font-size:13px; line-height:1.5;">Add a new event</p>
+        </a>
+
+        <a href="{% url 'events:events_list' %}"
+           style="text-decoration:none; display:block; border:1px solid #e5e7eb; border-radius:18px; padding:16px; background:#ffffff; box-shadow:0 8px 18px rgba(0,0,0,0.05); transition:transform 0.2s ease, box-shadow 0.2s ease;"
+           onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(0,0,0,0.08)';"
+           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 18px rgba(0,0,0,0.05)';">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+            <div style="width:38px; height:38px; border-radius:14px; background:rgba(16,185,129,0.12); display:flex; align-items:center; justify-content:center;">
+              <i class="fa-solid fa-earth-europe" style="color:#059669;"></i>
+            </div>
+            <h3 style="margin:0; color:#111827; font-size:15px; font-weight:900;">All events</h3>
+          </div>
+          <p style="margin:0; color:#6b7280; font-size:13px; line-height:1.5;">Browse available events</p>
+        </a>
+
+      {% endif %}
+
+    </div>
+
+  </div>
+
+</section>
+
+<script src="https://kit.fontawesome.com/4b4e94b96e.js" crossorigin="anonymous"></script>
+
+{% endblock %}
+
+
+

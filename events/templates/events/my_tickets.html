@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block title %}My tickets - TicketPlatform{% endblock %}
+{% block content %}
+
+<section style="padding:10px 0 0;">
+
+  <!-- Header card -->
+  <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:18px; padding:18px; box-shadow:0 10px 26px rgba(0,0,0,0.06);">
+    <h1 style="margin:0 0 6px; font-size:26px; font-weight:900; color:#2563eb; text-align:center;">
+      🎟️ My tickets
+    </h1>
+    <p style="margin:0; text-align:center; color:#6b7280; font-size:14px;">
+      View all purchased tickets
+    </p>
+  </div>
+
+  {% if tickets %}
+    <div style="margin-top:16px; display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:18px;">
+
+      {% for ticket in tickets %}
+        <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:18px; overflow:hidden; box-shadow:0 10px 26px rgba(0,0,0,0.06); transform:translateY(0); transition:transform 0.2s ease, box-shadow 0.2s ease;"
+             onmouseover="this.style.transform='translateY(-6px)'; this.style.boxShadow='0 16px 34px rgba(0,0,0,0.10)';"
+             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 26px rgba(0,0,0,0.06)';">
+
+          <!-- Event image -->
+          {% if ticket.ticket_type.event.image %}
+            <img src="{{ ticket.ticket_type.event.image.url }}" alt="{{ ticket.ticket_type.event.title }}" style="width:100%; height:170px; object-fit:cover; display:block;">
+          {% else %}
+            <img src="https://via.placeholder.com/400x200?text=No+Image" alt="No image" style="width:100%; height:170px; object-fit:cover; display:block;">
+          {% endif %}
+
+          <div style="padding:16px;">
+
+            <h2 style="margin:0; font-size:16px; font-weight:900; color:#111827; line-height:1.25;">
+              {{ ticket.ticket_type.event.title }}
+            </h2>
+
+            <div style="margin-top:10px; display:flex; flex-direction:column; gap:6px; color:#6b7280; font-size:13px;">
+              <span style="display:flex; gap:8px; align-items:center;">
+                <i class="fa-solid fa-location-dot" style="color:#6b7280;"></i>
+                <span>{{ ticket.ticket_type.event.location }}</span>
+              </span>
+
+              <span style="display:flex; gap:8px; align-items:center;">
+                <i class="fa-solid fa-calendar" style="color:#6b7280;"></i>
+                <span>{{ ticket.ticket_type.event.start_date|date:"d M Y H:i" }}</span>
+              </span>
+
+              <span style="display:flex; gap:8px; align-items:center;">
+                <i class="fa-solid fa-clock" style="color:#6b7280;"></i>
+                <span>Booked on: {{ ticket.created_at|date:"d M Y H:i" }}</span>
+              </span>
+            </div>
+
+            <div style="margin-top:12px; border-top:1px solid #e5e7eb; padding-top:12px;">
+              <p style="margin:0 0 10px; color:#111827; font-size:14px;">
+                Ticket category: <b>{{ ticket.ticket_type.name }}</b>
+              </p>
+
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                <span style="color:#374151; font-size:14px;">Quantity: <b>{{ ticket.quantity }}</b></span>
+                <span style="color:#111827; font-weight:900;">{{ ticket.ticket_type.price }} EUR</span>
+              </div>
+            </div>
+
+            <a href="{% url 'events:event_detail' ticket.ticket_type.event.id %}"
+               style="margin-top:14px; display:block; text-decoration:none; text-align:center; padding:11px 12px; background:#f3f4f6; border:1px solid #e5e7eb; border-radius:14px; color:#111827; font-weight:900; transition:opacity 0.2s ease;"
+               onmouseover="this.style.opacity='0.88';"
+               onmouseout="this.style.opacity='1';">
+              🔍 View event details
+            </a>
+
+          </div>
+        </div>
+      {% endfor %}
+
+    </div>
+
+  {% else %}
+    <div style="margin-top:16px; background:#ffffff; border:1px solid #e5e7eb; border-radius:18px; padding:28px 16px; box-shadow:0 10px 26px rgba(0,0,0,0.06); text-align:center;">
+      <p style="margin:0; font-size:14px; color:#6b7280;">
+        You don’t have any confirmed tickets yet.
+      </p>
+      <a href="{% url 'events:events_list' %}"
+         style="margin-top:14px; display:inline-block; text-decoration:none; padding:11px 14px; background:#2563eb; border-radius:14px; color:#ffffff; font-weight:900; transition:opacity 0.2s ease;"
+         onmouseover="this.style.opacity='0.88';"
+         onmouseout="this.style.opacity='1';">
+        🎫 Find new events
+      </a>
+    </div>
+  {% endif %}
+
+</section>
+
+<!-- Icons (optional if already included in base.html) -->
+<script src="https://kit.fontawesome.com/4b4e94b96e.js" crossorigin="anonymous"></script>
+
+{% endblock %}
+

@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<section
+  style="
+    max-width:520px;
+    margin:80px auto 0;
+    padding:50px 30px;
+    text-align:center;
+    border-radius:26px;
+    box-shadow:0 20px 40px rgba(0,0,0,0.12);
+    background:linear-gradient(135deg, #ffffff, #e8f5ff);
+  "
+>
+
+  <!-- Animated icon -->
+  <div
+    style="
+      font-size:60px;
+      margin-bottom:18px;
+      color:#22c55e;
+      animation:bounce 1.2s infinite;
+    "
+  >✅</div>
+
+  <h1
+    style="
+      margin:0 0 14px;
+      font-size:28px;
+      font-weight:900;
+      color:#4f46e5;
+    "
+  >
+    Payment successful!
+  </h1>
+
+  <p
+    style="
+      margin:0 0 26px;
+      font-size:17px;
+      color:#4b5563;
+      line-height:1.6;
+    "
+  >
+    Thanks for your purchase! Your reservation is now <strong>confirmed</strong>,
+    and your tickets have been added to your account.
+  </p>
+
+  <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:12px;">
+
+    <a
+      href="{% url 'events:my_tickets' %}"
+      style="
+        display:inline-block;
+        text-decoration:none;
+        padding:12px 22px;
+        border-radius:14px;
+        font-weight:900;
+        color:#ffffff;
+        background:linear-gradient(135deg, #4f46e5, #6d28d9);
+        box-shadow:0 12px 26px rgba(79,70,229,0.35);
+        transition:opacity 0.2s ease;
+      "
+      onmouseover="this.style.opacity='0.88';"
+      onmouseout="this.style.opacity='1';"
+    >
+      🎟️ View my tickets
+    </a>
+
+    <a
+      href="{% url 'events:events_list' %}"
+      style="
+        display:inline-block;
+        text-decoration:none;
+        padding:12px 18px;
+        border-radius:14px;
+        font-weight:800;
+        color:#4338ca;
+        border:1px solid rgba(79,70,229,0.35);
+        background:rgba(255,255,255,0.65);
+        transition:opacity 0.2s ease;
+      "
+      onmouseover="this.style.opacity='0.88';"
+      onmouseout="this.style.opacity='1';"
+    >
+      ↩️ Back to events
+    </a>
+
+  </div>
+
+</section>
+
+<style>
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+</style>
+
+{% endblock %}

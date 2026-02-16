@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Partners - TicketPlatform{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/partners.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="partners">
+  <div class="partners-card">
+
+    <div class="partners-header">
+      <h1 class="partners-title">🌐 Our partners</h1>
+      <p class="partners-subtitle">Brands and organizations supporting TicketPlatform.</p>
+    </div>
+
+    <div class="partners-grid">
+      {% for partner in partners %}
+        <div class="partner-tile">
+          <img class="partner-logo" src="{{ partner.logo.url }}" alt="{{ partner.name }}">
+        </div>
+      {% empty %}
+        <p class="partners-empty">No partners available at the moment.</p>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+

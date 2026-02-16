@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.env/
+.venv/
+
+# Environment variables
+.env
+
+# Django
+*.sqlite3
+db.sqlite3
+/media/
+staticfiles/
+
+# Static collected (Whitenoise)
+staticfiles/
+
+# Migrations cache
+*/migrations/__pycache__/
+
+# VS Code / IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Tests / coverage
+htmlcov/
+.coverage
+.tox/
+
+# Node (dacă folosești frontend build)
+node_modules/
+dist/
+
+# Temporary files
+*.bak
+*.swp

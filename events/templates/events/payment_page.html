@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block title %}Checkout - TicketPlatform{% endblock %}
+{% block content %}
+
+<section style="min-height:100vh; padding:60px 20px; background:linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899); display:flex; flex-direction:column; align-items:center;">
+
+  <!-- HEADER -->
+  <div style="text-align:center; color:#ffffff; margin-bottom:35px;">
+    <h1 style="margin:0 0 8px; font-size:38px; font-weight:800; line-height:1.1;">💳 Checkout</h1>
+    <p style="margin:0; opacity:0.92; font-size:16px;">
+      Event: <strong>{{ reservation.ticket_type.event.title }}</strong>
+    </p>
+  </div>
+
+  <!-- LUXURY PAYMENT CARD -->
+  <div style="width:100%; max-width:480px; padding:26px; background:rgba(255,255,255,0.15); backdrop-filter:blur(18px); border-radius:22px; box-shadow:0 12px 35px rgba(0,0,0,0.25); color:#ffffff; border:1px solid rgba(255,255,255,0.18);">
+
+    <!-- Summary -->
+    <div style="margin-bottom:14px;">
+      <p style="margin:0 0 10px; font-size:15px; display:flex; align-items:center; gap:10px; opacity:0.95;">
+        <i class="fa-solid fa-ticket" style="color:#ffffff;"></i>
+        Ticket type: <b>{{ reservation.ticket_type.name }}</b>
+      </p>
+
+      <p style="margin:0 0 10px; font-size:15px; display:flex; align-items:center; gap:10px; opacity:0.95;">
+        <i class="fa-solid fa-hashtag" style="color:#ffffff;"></i>
+        Quantity: <b>{{ reservation.quantity }}</b>
+      </p>
+
+      <p style="margin:0; font-size:15px; display:flex; align-items:center; gap:10px; opacity:0.95;">
+        <i class="fa-solid fa-wallet" style="color:#ffffff;"></i>
+        Total: <b>{{ payment.amount }} {{ CURRENCY|upper }}</b>
+      </p>
+    </div>
+
+    <!-- Stripe UI mount -->
+    <div id="payment-element" style="margin-top:12px;"></div>
+
+    <button
+      id="submit"
+      type="button"
+      style="margin-top:18px; width:100%; background:#4f46e5; border:none; padding:12px 16px; font-weight:900; color:#ffffff; border-radius:12px; cursor:pointer; font-size:16px; transition:opacity 0.2s ease;"
+      onmouseover="this.style.opacity='0.88';"
+      onmouseout="this.style.opacity='1';"
+    >
+      Pay now
+    </button>
+
+    <div id="payment-message" style="margin-top:14px; padding:12px; border-radius:10px; text-align:center; font-size:13px; display:none;"></div>
+  </div>
+</section>
+
+<!-- Stripe -->
+<script src="https://js.stripe.com/v3/"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const stripe = Stripe("{{ STRIPE_PUBLIC_KEY }}");
+
+  async function initialize() {
+    const response = await fetch("{% url 'events:create_payment_intent' reservation.id %}", {
+      credentials: "include",
+    });
+
+    const data = await response.json();
+
+    if (!data.clientSecret) {
+      alert("Payment initialization error.");
+      return;
+    }
+
+    const elements = stripe.elements({ clientSecret: data.clientSecret });
+    const paymentElement = elements.create("payment");
+    paymentElement.mount("#payment-element");
+
+    document.getElementById("submit").addEventListener("click", async () => {
+      const { error } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: window.location.origin + "{% url 'events:payment_success' %}",
+        },
+      });
+
+      if (error) {
+        const msg = document.getElementById("payment-message");
+        msg.textContent = error.message || "Payment failed. Please try again.";
+        msg.style.display = "block";
+        msg.style.background = "rgba(255, 0, 0, 0.25)";
+        msg.style.color = "#ffe4e6";
+        msg.style.border = "1px solid rgba(255,255,255,0.18)";
+      }
+    });
+  }
+
+  initialize();
+});
+</script>
+
+<!-- FontAwesome (optional if already included in base.html) -->
+<script src="https://kit.fontawesome.com/4b4e94b96e.js" crossorigin="anonymous"></script>
+
+{% endblock %}
+
+

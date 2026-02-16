@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Contact & Support - TicketPlatform{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/contact.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="support">
+  <div class="support-card">
+
+    <div class="support-header">
+      <h1 class="support-title">💬 TicketPlatform Support</h1>
+      <p class="support-subtitle">Send us a message and we’ll get back to you as soon as possible.</p>
+    </div>
+
+    <!-- Chat -->
+    <div id="chatBox" class="chat">
+      {% for msg in support_messages %}
+        {% if msg.is_support %}
+          <div class="msg msg-left">
+            <div class="bubble bubble-support">
+              <p class="bubble-name">{{ msg.name }}</p>
+              <p class="bubble-text">{{ msg.message }}</p>
+              <p class="bubble-time">{{ msg.created_at|date:"d M Y, H:i" }}</p>
+            </div>
+          </div>
+        {% else %}
+          <div class="msg msg-right">
+            <div class="bubble bubble-user">
+              <p class="bubble-name">{{ msg.name }}</p>
+              <p class="bubble-text">{{ msg.response|default:msg.message }}</p>
+              <p class="bubble-time">{{ msg.created_at|date:"d M Y, H:i" }}</p>
+            </div>
+          </div>
+        {% endif %}
+      {% empty %}
+        <p class="chat-empty">No messages yet. Send the first one! 💌</p>
+      {% endfor %}
+    </div>
+
+    <!-- Form -->
+    <form method="POST" class="support-form">
+      {% csrf_token %}
+      {{ form.honeypot }}
+
+      <div class="field">
+        {{ form.name }}
+        {% if form.name.errors %}
+          <p class="field-error">{{ form.name.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <div class="field">
+        {{ form.email }}
+        {% if form.email.errors %}
+          <p class="field-error">{{ form.email.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <div class="field">
+        {{ form.message }}
+        {% if form.message.errors %}
+          <p class="field-error">{{ form.message.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <button type="submit" class="send-btn">
+        Send message ✨
+      </button>
+    </form>
+
+  </div>
+</section>
+
+{% block extra_js %}
+<script src="{% static 'js/contact.js' %}"></script>
+{% endblock %}
+{% endblock %}
+
+
+

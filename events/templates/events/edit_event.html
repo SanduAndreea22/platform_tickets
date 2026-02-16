@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<section style="max-width:900px; margin:0 auto; padding:38px 16px;">
+  <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:18px; padding:18px 18px 8px; box-shadow:0 10px 30px rgba(0,0,0,0.06);">
+
+    <h1 style="margin:8px 0 6px; font-size:28px; font-weight:800; color:#2563eb; text-align:center;">
+      ✏️ Edit event
+    </h1>
+    <p style="margin:0 0 18px; text-align:center; color:#6b7280; font-size:14px;">
+      Update event details and ticket types below.
+    </p>
+
+    <form method="post" enctype="multipart/form-data" style="display:flex; flex-direction:column; gap:16px; padding:6px 4px 16px;">
+      {% csrf_token %}
+
+      <div>
+        <label style="display:block; margin:0 0 8px; color:#374151; font-weight:700;">Title</label>
+        <input
+          type="text"
+          name="title"
+          value="{{ event.title }}"
+          style="width:100%; box-sizing:border-box; border:1px solid #d1d5db; border-radius:14px; padding:11px 12px; background:#ffffff; outline:none;"
+          onfocus="this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 4px rgba(37,99,235,0.15)';"
+          onblur="this.style.borderColor='#d1d5db'; this.style.boxShadow='none';"
+        >
+      </div>
+
+      <div>
+        <label style="display:block; margin:0 0 8px; color:#374151; font-weight:700;">Description</label>
+        <textarea
+          name="description"
+          rows="5"
+          style="width:100%; box-sizing:border-box; border:1px solid #d1d5db; border-radius:14px; padding:11px 12px; background:#ffffff; outline:none; resize:vertical;"
+          onfocus="this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 4px rgba(37,99,235,0.15)';"
+          onblur="this.style.borderColor='#d1d5db'; this.style.boxShadow='none';"
+        >{{ event.description }}</textarea>
+      </div>
+
+      <div>
+        <label style="display:block; margin:0 0 8px; color:#374151; font-weight:700;">Location</label>
+        <input
+          type="text"
+          name="location"
+          value="{{ event.location }}"
+          style="width:100%; box-sizing:border-box; border:1px solid #d1d5db; border-radius:14px; padding:11px 12px; background:#ffffff; outline:none;"
+          onfocus="this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 4px rgba(37,99,235,0.15)';"
+          onblur="this.style.borderColor='#d1d5db'; this.style.boxShadow='none';"
+        >
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+        <div>
+          <label style="display:block; margin:0 0 8px; color:#374151; font-weight:700;">Start date</label>
+          <input
+            type="datetime-local"
+            name="start_date"
+            value="{{ event.start_date|date:'Y-m-d\\TH:i' }}"
+            style="width:100%; box-sizing:border-box; border:1px solid #d1d5db; border-radius:14px; padding:11px 12px; background:#ffffff; outline:none;"
+            onfocus="this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 4px rgba(37,99,235,0.15)';"
+            onblur="this.style.borderColor='#d1d5db'; this.style.boxShadow='none';"
+          >
+        </div>
+
+        <div>
+          <label style="display:block; margin:0 0 8px; color:#374151; font-weight:700;">End date</label>
+          <input
+            type="datetime-local"
+            name="end_date"
+            value="{{ event.end_date|date:'Y-m-d\\TH:i' }}"
+            style="width:100%; box-sizing:border-box; border:1px solid #d1d5db; border-radius:14px; padding:11px 12px; background:#ffffff; outline:none;"
+            onfocus="this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 4px rgba(37,99,235,0.15)';"
+            onblur="this.style.borderColor='#d1d5db'; this.style.boxShadow='none';"
+          >
+        </div>
+      </div>
+
+      <div>
+        <label style="display:block; margin:0 0 8px; color:#374151; font-weight:700;">Image (optional)</label>
+        <input type="file" name="image" accept="image/*" style="width:100%;">
+
+        {% if event.image %}
+          <div style="margin-top:8px; font-size:12px; color:#6b7280;">
+            Current image: <span style="font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;">{{ event.image.url }}</span>
+          </div>
+        {% endif %}
+      </div>
+
+      <hr style="border:none; border-top:1px solid #e5e7eb; margin:6px 0;">
+
+      <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+        <div>
+          <h2 style="margin:0; font-size:18px; font-weight:800; color:#2563eb;">🎟️ Ticket types</h2>
+          <p style="margin:6px 0 0; color:#6b7280; font-size:13px;">Edit existing ticket types below.</p>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:10px; margin-top:8px;">
+        {% for ticket in tickets %}
+          <div style="display:grid; grid-template-columns:1.2fr 0.8fr 0.8fr; gap:10px;">
+            <input type="hidden" name="ticket_id" value="{{ ticket.id }}">
+
+            <input
+              type="text"
+              name="ticket_name"
+              value="{{ ticket.name }}"
+              style="width:100%; box-sizing:border-box; border:1px solid #d1d5db; border-radius:14px; padding:11px 12px; background:#ffffff; outline:none;"
+              onfocus="this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 4px rgba(37,99,235,0.15)';"
+              onblur="this.style.borderColor='#d1d5db'; this.style.boxShadow='none';"
+            >
+
+            <input
+              type="number"
+              name="ticket_price"
+              value="{{ ticket.price }}"
+              step="0.01"
+              placeholder="Price (EUR)"
+              style="width:100%; box-sizing:border-box; border:1px solid #d1d5db; border-radius:14px; padding:11px 12px; background:#ffffff; outline:none;"
+              onfocus="this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 4px rgba(37,99,235,0.15)';"
+              onblur="this.style.borderColor='#d1d5db'; this.style.boxShadow='none';"
+            >
+
+            <input
+              type="number"
+              name="ticket_quantity"
+              value="{{ ticket.available_quantity }}"
+              placeholder="Quantity"
+              style="width:100%; box-sizing:border-box; border:1px solid #d1d5db; border-radius:14px; padding:11px 12px; background:#ffffff; outline:none;"
+              onfocus="this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 4px rgba(37,99,235,0.15)';"
+              onblur="this.style.borderColor='#d1d5db'; this.style.boxShadow='none';"
+            >
+          </div>
+        {% endfor %}
+      </div>
+
+      <div style="display:flex; justify-content:center; margin-top:10px;">
+        <button
+          type="submit"
+          style="background:#2563eb; color:#ffffff; border:none; padding:12px 18px; border-radius:14px; font-weight:800; cursor:pointer; min-width:240px;"
+          onmouseover="this.style.background='#1d4ed8';"
+          onmouseout="this.style.background='#2563eb';"
+        >
+          Save changes
+        </button>
+      </div>
+
+      <p style="margin:8px 0 0; text-align:center; font-size:12px; color:#9ca3af;">
+        Make sure dates and ticket availability are correct before saving.
+      </p>
+    </form>
+  </div>
+</section>
+
+{% endblock %}

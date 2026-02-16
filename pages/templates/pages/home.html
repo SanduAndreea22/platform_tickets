@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}TicketPlatform{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="home">
+
+  <div class="home-hero">
+    <h1 class="home-title">TicketPlatform</h1>
+    <p class="home-subtitle">Choose your path.</p>
+  </div>
+
+  <div class="home-grid">
+
+    <!-- Participant -->
+    <div class="role-card">
+      <div class="role-icon is-primary">
+        <i class="fa-solid fa-ticket"></i>
+      </div>
+
+      <h2 class="role-title">Participant</h2>
+      <p class="role-text">
+        Discover upcoming events, reserve tickets, and manage your reservations.
+      </p>
+
+      <div class="role-actions">
+        <a href="{% url 'events:events_list' %}" class="btn btn-primary">Browse events</a>
+
+        {% if not user.is_authenticated %}
+          <a href="{% url 'users:register' %}" class="btn btn-ghost">Create account</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Organizer -->
+    <div class="role-card">
+      <div class="role-icon is-accent">
+        <i class="fa-solid fa-calendar-plus"></i>
+      </div>
+
+      <h2 class="role-title">Organizer</h2>
+      <p class="role-text">
+        Create events, define ticket types, and track reservations in your dashboard.
+      </p>
+
+      <div class="role-actions">
+        {% if user.is_authenticated and user.is_organizer %}
+          <a href="{% url 'events:create_event' %}" class="btn btn-primary">Create event</a>
+          <a href="{% url 'events:my_events' %}" class="btn btn-ghost">My events</a>
+        {% else %}
+          <a href="{% url 'users:register' %}" class="btn btn-primary">Become an organizer</a>
+          <a href="{% url 'pages:contact' %}" class="btn btn-ghost">Contact support</a>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+
+</section>
+{% endblock %}
+
+
+
+
+

@@ -1,0 +1,72 @@
+.partners {
+  padding: 10px 0 30px;
+}
+
+.partners-card {
+  background:
+    radial-gradient(900px 400px at 10% 0%, rgba(99,102,241,.12), transparent 60%),
+    radial-gradient(900px 400px at 90% 10%, rgba(236,72,153,.10), transparent 60%),
+    var(--surface);
+
+
+.partners-header {
+  margin-bottom: 16px;
+}
+
+.partner-tile {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+
+
+.partners-subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.partners-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  align-items: center;
+  margin-top: 14px;
+}
+
+.partner-tile {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 18px;
+  background: rgba(255,255,255,0.02);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 90px;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+
+.partner-tile:hover {
+  transform: translateY(-3px);
+  border-color: rgba(99,102,241,.35);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+}
+
+.partner-logo {
+  max-height: 70px;
+  width: auto;
+  object-fit: contain;
+  opacity: 0.96;
+  transition: transform .15s ease, opacity .15s ease;
+}
+
+.partner-tile:hover .partner-logo {
+  transform: scale(1.04);
+  opacity: 1;
+}
+
+.partners-empty {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  grid-column: 1 / -1;
+}

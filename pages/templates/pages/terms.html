@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Terms & Conditions - TicketPlatform{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/legal.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="legal">
+  <div class="legal-card">
+
+    <header class="legal-header">
+      <h1 class="legal-title">📜 Terms & Conditions</h1>
+      <p class="legal-intro">
+        By using the TicketPlatform website, you agree to these Terms and Conditions.
+        We reserve the right to update or modify the website content and policies at any time.
+      </p>
+    </header>
+
+    <div class="legal-section">
+      <h2>1. Platform usage</h2>
+      <ul>
+        <li>Users must provide accurate and complete information.</li>
+        <li>Using the platform for illegal or unauthorized purposes is prohibited.</li>
+        <li>The platform reserves the right to suspend accounts that violate these rules.</li>
+      </ul>
+    </div>
+
+    <div class="legal-section">
+      <h2>2. User rights and responsibilities</h2>
+      <ul>
+        <li>Users are responsible for keeping account data confidential.</li>
+        <li>All transactions made through the platform must be authorized by the user.</li>
+        <li>Users must comply with applicable event and ticketing laws.</li>
+      </ul>
+    </div>
+
+    <div class="legal-section">
+      <h2>3. Platform liability</h2>
+      <ul>
+        <li>TicketPlatform is not responsible for losses caused by improper use of the platform.</li>
+        <li>We do not guarantee uninterrupted availability of the website or services.</li>
+      </ul>
+    </div>
+
+    <div class="legal-section">
+      <h2>4. Changes to terms</h2>
+      <p>
+        TicketPlatform reserves the right to modify these Terms & Conditions at any time.
+        Changes become effective immediately after being published on the website.
+      </p>
+    </div>
+
+    <div class="legal-section">
+      <h2>5. Contact</h2>
+      <p>
+        For any questions regarding these Terms & Conditions, please contact us through the
+        <a class="legal-link" href="{% url 'pages:contact' %}">contact page</a>.
+      </p>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+

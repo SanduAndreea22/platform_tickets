@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block title %}All events - TicketPlatform{% endblock %}
+{% block content %}
+
+<section style="padding:10px 0 0;">
+
+  <!-- Header card -->
+  <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:18px; padding:18px; box-shadow:0 10px 26px rgba(0,0,0,0.06);">
+    <h1 style="margin:0 0 6px; font-size:26px; font-weight:900; color:#2563eb; text-align:center;">
+      🎉 All available events
+    </h1>
+    <p style="margin:0; text-align:center; color:#6b7280; font-size:14px;">
+      Discover experiences, concerts, and unique events
+    </p>
+  </div>
+
+  <!-- Search card -->
+  <form method="get"
+        style="margin-top:14px; background:#ffffff; border:1px solid #e5e7eb; border-radius:18px; padding:14px; box-shadow:0 10px 26px rgba(0,0,0,0.06); display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;">
+
+    <div style="flex:1; min-width:240px; display:flex; align-items:center; gap:10px; border:1px solid #e5e7eb; border-radius:14px; padding:10px 12px; background:#ffffff;">
+      <i class="fa-solid fa-magnifying-glass" style="color:#6b7280;"></i>
+      <input
+        type="text"
+        name="q"
+        value="{{ query }}"
+        placeholder="Search for an event..."
+        style="width:100%; border:none; outline:none; background:transparent; color:#111827; font-size:14px;"
+      >
+    </div>
+
+    <div style="min-width:200px; display:flex; align-items:center; gap:10px; border:1px solid #e5e7eb; border-radius:14px; padding:10px 12px; background:#ffffff;">
+      <i class="fa-solid fa-calendar" style="color:#6b7280;"></i>
+      <input
+        type="date"
+        name="date"
+        value="{{ date }}"
+        style="width:100%; border:none; outline:none; background:transparent; color:#111827; font-size:14px;"
+      >
+    </div>
+
+    <button
+      type="submit"
+      style="background:#2563eb; border:none; color:#ffffff; padding:11px 16px; border-radius:14px; font-weight:900; cursor:pointer; transition:opacity 0.2s ease;"
+      onmouseover="this.style.opacity='0.88';"
+      onmouseout="this.style.opacity='1';"
+    >
+      Search
+    </button>
+  </form>
+
+  <!-- Grid -->
+  <div style="margin-top:16px; display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:18px;">
+
+    {% for event in events %}
+      <div
+        style="background:#ffffff; border:1px solid #e5e7eb; border-radius:18px; overflow:hidden; box-shadow:0 10px 26px rgba(0,0,0,0.06); transform:translateY(0); transition:transform 0.2s ease, box-shadow 0.2s ease;"
+        onmouseover="this.style.transform='translateY(-6px)'; this.style.boxShadow='0 16px 34px rgba(0,0,0,0.10)';"
+        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 26px rgba(0,0,0,0.06)';"
+      >
+
+        <!-- Image -->
+        {% if event.image %}
+          <img src="{{ event.image.url }}" alt="{{ event.title }}" style="width:100%; height:180px; object-fit:cover; display:block;">
+        {% else %}
+          <img src="https://via.placeholder.com/400x200?text=No+Image" alt="No image" style="width:100%; height:180px; object-fit:cover; display:block;">
+        {% endif %}
+
+        <!-- Content -->
+        <div style="padding:16px;">
+          <h2 style="margin:0 0 8px; font-size:18px; font-weight:900; color:#111827; line-height:1.2;">
+            {{ event.title }}
+          </h2>
+
+          <p style="margin:0 0 10px; color:#4b5563; line-height:1.45;">
+            {{ event.description|truncatewords:20 }}
+          </p>
+
+          <div style="font-size:13px; color:#6b7280; margin:0 0 12px; display:flex; flex-direction:column; gap:6px;">
+            <span style="display:flex; gap:8px; align-items:center;">
+              <i class="fa-solid fa-location-dot" style="color:#6b7280;"></i>
+              <span>{{ event.location }}</span>
+            </span>
+            <span style="display:flex; gap:8px; align-items:center;">
+              <i class="fa-solid fa-calendar" style="color:#6b7280;"></i>
+              <span>{{ event.start_date|date:"d M Y H:i" }}</span>
+            </span>
+          </div>
+
+          <a
+            href="{% url 'events:event_detail' event.pk %}"
+            style="display:block; text-align:center; text-decoration:none; background:#f3f4f6; border:1px solid #e5e7eb; padding:10px 0; border-radius:14px; font-weight:900; color:#111827; transition:opacity 0.2s ease;"
+            onmouseover="this.style.opacity='0.88';"
+            onmouseout="this.style.opacity='1';"
+          >
+            View details →
+          </a>
+        </div>
+      </div>
+
+    {% empty %}
+      <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:18px; padding:18px; box-shadow:0 10px 26px rgba(0,0,0,0.06); text-align:center; grid-column:1 / -1;">
+        <p style="margin:0; color:#6b7280;">
+          😔 No events match your selected criteria.
+        </p>
+      </div>
+    {% endfor %}
+
+  </div>
+
+</section>
+
+<!-- FontAwesome (optional if already included in base.html) -->
+<script src="https://kit.fontawesome.com/4b4e94b96e.js" crossorigin="anonymous"></script>
+
+{% endblock %}
+
+
+

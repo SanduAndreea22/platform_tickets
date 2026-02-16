@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Privacy Policy - TicketPlatform{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/legal.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="legal">
+  <div class="legal-card">
+
+    <header class="legal-header">
+      <h1 class="legal-title">🔒 Privacy Policy</h1>
+      <p class="legal-intro">
+        TicketPlatform respects the privacy of users&#39; personal data. The collected information is used
+        exclusively for account management and order processing.
+      </p>
+    </header>
+
+    <div class="legal-section">
+      <h2>1. Data collection</h2>
+      <p>We collect only the information necessary to process orders and provide a personalized experience.</p>
+      <ul>
+        <li>Full name</li>
+        <li>Email address</li>
+        <li>Ticket purchase information</li>
+      </ul>
+    </div>
+
+    <div class="legal-section">
+      <h2>2. Use of data</h2>
+      <p>
+        The collected data is used strictly for internal purposes and is never shared with third parties
+        without the user&#39;s explicit consent.
+      </p>
+      <ul>
+        <li>Order processing</li>
+        <li>Sending notifications and confirmations</li>
+        <li>Improving services and user experience</li>
+      </ul>
+    </div>
+
+    <div class="legal-section">
+      <h2>3. Data protection</h2>
+      <p>
+        We implement technical and organizational measures to protect personal data against unauthorized access,
+        loss, or modification.
+      </p>
+    </div>
+
+    <div class="legal-section">
+      <h2>4. User rights</h2>
+      <ul>
+        <li>Right to access personal data</li>
+        <li>Right to correct personal data</li>
+        <li>Right to data deletion (&ldquo;right to be forgotten&rdquo;)</li>
+        <li>Right to object to data processing</li>
+      </ul>
+    </div>
+
+    <div class="legal-section">
+      <h2>5. Contact</h2>
+      <p>
+        For any questions regarding data privacy, you can contact us on the
+        <a class="legal-link" href="{% url 'pages:contact' %}">contact page</a>.
+      </p>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+

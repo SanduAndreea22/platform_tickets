@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create account - TicketPlatform{% endblock %}
+
+{% block content %}
+
+<section style="padding:20px 0;">
+
+  <div style="
+    max-width:460px;
+    margin:0 auto;
+    background:#ffffff;
+    border:1px solid #e5e7eb;
+    border-radius:18px;
+    padding:26px;
+    box-shadow:0 10px 26px rgba(0,0,0,0.06);
+    text-align:center;
+  ">
+
+    <h2 style="margin:0 0 6px; font-size:24px; font-weight:900; color:#2563eb;">
+      Create a new account 🎟️
+    </h2>
+
+    <p style="margin:0 0 18px; font-size:14px; color:#6b7280;">
+      Fill in your details to join the platform
+    </p>
+
+    <form method="POST" style="text-align:left; display:flex; flex-direction:column; gap:14px;">
+      {% csrf_token %}
+
+      <!-- Username -->
+      <label style="font-size:13px; color:#6b7280;">Username</label>
+      <div style="position:relative; display:flex; align-items:center;">
+        <i class="fa-solid fa-user"
+           style="position:absolute; left:12px; color:#9ca3af; font-size:14px;"></i>
+
+        <input type="text" name="username" autocomplete="username" required
+          style="
+            width:100%;
+            padding:10px 12px 10px 36px;
+            border-radius:14px;
+            border:1px solid #e5e7eb;
+            background:#ffffff;
+            outline:none;
+            font-size:14px;
+            color:#111827;
+          "
+          onfocus="this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 4px rgba(37,99,235,0.12)';"
+          onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none';"
+        >
+      </div>
+
+      <!-- Email -->
+      <label style="font-size:13px; color:#6b7280;">Email</label>
+      <div style="position:relative; display:flex; align-items:center;">
+        <i class="fa-solid fa-envelope"
+           style="position:absolute; left:12px; color:#9ca3af; font-size:14px;"></i>
+
+        <input type="email" name="email" autocomplete="email" required
+          style="
+            width:100%;
+            padding:10px 12px 10px 36px;
+            border-radius:14px;
+            border:1px solid #e5e7eb;
+            background:#ffffff;
+            outline:none;
+            font-size:14px;
+            color:#111827;
+          "
+          onfocus="this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 4px rgba(37,99,235,0.12)';"
+          onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none';"
+        >
+      </div>
+
+      <!-- Password -->
+      <label style="font-size:13px; color:#6b7280;">Password</label>
+      <div style="position:relative; display:flex; align-items:center;">
+        <i class="fa-solid fa-lock"
+           style="position:absolute; left:12px; color:#9ca3af; font-size:14px;"></i>
+
+        <input type="password" id="password" name="password" autocomplete="new-password" required
+          style="
+            width:100%;
+            padding:10px 36px 10px 36px;
+            border-radius:14px;
+            border:1px solid #e5e7eb;
+            background:#ffffff;
+            outline:none;
+            font-size:14px;
+            color:#111827;
+          "
+          onfocus="this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 4px rgba(37,99,235,0.12)';"
+          onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none';"
+        >
+
+        <span onclick="togglePassword()"
+              style="position:absolute; right:12px; cursor:pointer; color:#6b7280;">
+          <i id="eyeIcon" class="fa-solid fa-eye"></i>
+        </span>
+      </div>
+
+      <!-- Role -->
+      <label style="font-size:13px; color:#6b7280;">User role</label>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+
+        <label style="display:flex; align-items:center; gap:8px; padding:10px 12px; border:1px solid #e5e7eb; border-radius:14px; background:#ffffff; cursor:pointer; flex:1; min-width:180px;">
+          <input type="radio" name="role" value="participant" checked>
+          <span style="color:#111827; font-weight:800;">🎟️ Participant</span>
+        </label>
+
+        <label style="display:flex; align-items:center; gap:8px; padding:10px 12px; border:1px solid #e5e7eb; border-radius:14px; background:#ffffff; cursor:pointer; flex:1; min-width:180px;">
+          <input type="radio" name="role" value="organizer">
+          <span style="color:#111827; font-weight:800;">🧑‍💼 Organizer</span>
+        </label>
+
+      </div>
+
+      <!-- Button -->
+      <button type="submit"
+        style="
+          margin-top:6px;
+          padding:11px;
+          background:#2563eb;
+          color:#ffffff;
+          border:none;
+          border-radius:14px;
+          font-weight:900;
+          cursor:pointer;
+          font-size:15px;
+          transition:opacity 0.2s ease;
+          width:100%;
+        "
+        onmouseover="this.style.opacity='0.88';"
+        onmouseout="this.style.opacity='1';"
+      >
+        Create account
+      </button>
+
+    </form>
+
+    <!-- Messages -->
+    {% if messages %}
+      <div style="margin-top:14px; display:flex; flex-direction:column; gap:10px;">
+        {% for message in messages %}
+          <div style="
+            padding:12px;
+            border-radius:14px;
+            border:1px solid #e5e7eb;
+            background:#ffffff;
+            font-size:13px;
+            color:#111827;
+            box-shadow:0 8px 18px rgba(0,0,0,0.05);
+          ">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Login link -->
+    <p style="margin-top:18px; font-size:14px; color:#6b7280;">
+      Already have an account?
+      <a href="{% url 'users:login' %}"
+         style="color:#2563eb; font-weight:900; text-decoration:none;">
+        Log in
+      </a>
+    </p>
+
+  </div>
+</section>
+
+<!-- FontAwesome -->
+<script src="https://kit.fontawesome.com/4b4e94b96e.js" crossorigin="anonymous"></script>
+
+<!-- Show/Hide Password -->
+<script>
+function togglePassword() {
+  const pass = document.getElementById("password");
+  const icon = document.getElementById("eyeIcon");
+  if (pass.type === "password") {
+    pass.type = "text";
+    icon.classList.replace("fa-eye","fa-eye-slash");
+  } else {
+    pass.type = "password";
+    icon.classList.replace("fa-eye-slash","fa-eye");
+  }
+}
+</script>
+
+{% endblock %}
+

@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% block title %}{{ event.title }} - Event details{% endblock %}
+{% block content %}
+
+<section style="padding:10px 0 0;">
+
+  <!-- Banner / cover card -->
+  <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:18px; overflow:hidden; box-shadow:0 10px 26px rgba(0,0,0,0.06);">
+    <div style="position:relative; width:100%; height:260px; overflow:hidden;">
+      {% if event.image %}
+        <img src="{{ event.image.url }}" alt="{{ event.title }}" style="width:100%; height:100%; object-fit:cover; display:block;">
+      {% else %}
+        <img src="https://via.placeholder.com/1200x400?text=No+Image" alt="No image" style="width:100%; height:100%; object-fit:cover; display:block;">
+      {% endif %}
+
+      <div style="position:absolute; left:0; right:0; bottom:0; padding:16px; background:linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%);">
+        <h1 style="margin:0; color:#ffffff; font-size:28px; font-weight:900; line-height:1.15;">
+          {{ event.title }}
+        </h1>
+
+        {% if event.banner_text %}
+          <p style="margin:6px 0 0; color:#ffffff; opacity:0.92; font-size:14px;">
+            {{ event.banner_text }}
+          </p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div style="padding:18px;">
+      <!-- Description -->
+      <p style="margin:0 0 14px; font-size:15px; color:#374151; line-height:1.6;">
+        {{ event.description }}
+      </p>
+
+      {% if event.promo_message %}
+        <div style="margin:0 0 14px; padding:12px 14px; border-radius:14px; background:#ffffff; border:1px solid #e5e7eb; border-left:6px solid {{ event.theme_color }}; box-shadow:0 8px 18px rgba(0,0,0,0.05); color:#111827; font-weight:800;">
+          🎉 {{ event.promo_message }}
+        </div>
+      {% endif %}
+
+      <!-- Info row -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px; margin:0;">
+        <div style="display:flex; gap:10px; align-items:center; padding:12px 12px; border-radius:14px; border:1px solid #e5e7eb; background:#f9fafb;">
+          <i class="fa-solid fa-location-dot" style="color:#6b7280;"></i>
+          <span style="color:#111827; font-size:14px;"><b>Location:</b> {{ event.location }}</span>
+        </div>
+
+        <div style="display:flex; gap:10px; align-items:center; padding:12px 12px; border-radius:14px; border:1px solid #e5e7eb; background:#f9fafb;">
+          <i class="fa-solid fa-play" style="color:#6b7280;"></i>
+          <span style="color:#111827; font-size:14px;"><b>Starts:</b> {{ event.start_date|date:"d M Y H:i" }}</span>
+        </div>
+
+        <div style="display:flex; gap:10px; align-items:center; padding:12px 12px; border-radius:14px; border:1px solid #e5e7eb; background:#f9fafb;">
+          <i class="fa-solid fa-flag-checkered" style="color:#6b7280;"></i>
+          <span style="color:#111827; font-size:14px;"><b>Ends:</b> {{ event.end_date|date:"d M Y H:i" }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ticket types -->
+  <div style="margin-top:16px; background:#ffffff; border:1px solid #e5e7eb; border-radius:18px; padding:18px; box-shadow:0 10px 26px rgba(0,0,0,0.06);">
+    <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+      <h2 style="margin:0; font-size:20px; font-weight:900; color:#111827;">
+        Ticket types
+      </h2>
+      <span style="font-size:12px; color:#6b7280;">
+        Prices shown in EUR
+      </span>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px;">
+
+      {% for ticket in event.ticket_types.all %}
+        <div style="border:1px solid #e5e7eb; border-radius:18px; background:#ffffff; padding:16px; box-shadow:0 8px 18px rgba(0,0,0,0.05);">
+          <h3 style="margin:0 0 6px; font-size:16px; font-weight:900; color:#111827;">
+            {{ ticket.name }}
+          </h3>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 0 6px;">
+            <span style="color:#6b7280; font-size:13px;">💰 Price</span>
+            <span style="color:#111827; font-weight:900;">{{ ticket.price }} EUR</span>
+          </div>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 0 12px;">
+            <span style="color:#6b7280; font-size:13px;">Availability</span>
+            <span style="color:#111827; font-weight:800;">{{ ticket.available_quantity }} left</span>
+          </div>
+
+          {% if user.is_authenticated and user.is_participant %}
+            <form method="post" style="margin:0; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+              {% csrf_token %}
+              <input type="hidden" name="ticket_id" value="{{ ticket.id }}">
+
+              <input
+                type="number"
+                name="quantity"
+                value="1"
+                min="1"
+                max="{{ ticket.available_quantity }}"
+                style="width:110px; box-sizing:border-box; border:1px solid #e5e7eb; border-radius:14px; padding:10px 12px; background:#ffffff; outline:none; color:#111827;"
+                onfocus="this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 4px rgba(37,99,235,0.12)';"
+                onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none';"
+              >
+
+              <button
+                type="submit"
+                style="flex:1; min-width:170px; background:{{ event.theme_color }}; border:none; color:#ffffff; padding:11px 14px; border-radius:14px; font-weight:900; cursor:pointer; transition:opacity 0.2s ease;"
+                onmouseover="this.style.opacity='0.88';"
+                onmouseout="this.style.opacity='1';"
+              >
+                Reserve now
+              </button>
+            </form>
+          {% else %}
+            <p style="margin:0; color:#6b7280; font-size:13px;">
+              Log in as a participant to reserve tickets.
+            </p>
+          {% endif %}
+        </div>
+
+      {% empty %}
+        <div style="border:1px solid #e5e7eb; border-radius:18px; padding:18px; background:#f9fafb; text-align:center; grid-column:1 / -1;">
+          <p style="margin:0; color:#6b7280;">No tickets available.</p>
+        </div>
+      {% endfor %}
+
+    </div>
+  </div>
+
+</section>
+
+<!-- Icons (optional if already included in base.html) -->
+<script src="https://kit.fontawesome.com/4b4e94b96e.js" crossorigin="anonymous"></script>
+
+{% endblock %}
+
+
+

@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<section style="max-width:1100px; margin:0 auto; padding:38px 16px;">
+  <h1 style="margin:0 0 22px; font-size:28px; font-weight:900; color:#2563eb; text-align:center;">
+    🎟️ Ticket management — {{ event.title }}
+  </h1>
+
+  {% if reservations %}
+    <div style="width:100%; overflow-x:auto; border-radius:16px;">
+      <table style="min-width:900px; width:100%; border-collapse:separate; border-spacing:0; background:#ffffff; border:1px solid #e5e7eb; border-radius:16px; box-shadow:0 10px 26px rgba(0,0,0,0.06); overflow:hidden;">
+        <thead>
+          <tr style="background:#2563eb; color:#ffffff;">
+            <th style="padding:12px 14px; text-align:left; font-size:13px; font-weight:900;">Participant</th>
+            <th style="padding:12px 14px; text-align:left; font-size:13px; font-weight:900;">Ticket type</th>
+            <th style="padding:12px 14px; text-align:left; font-size:13px; font-weight:900;">Quantity</th>
+            <th style="padding:12px 14px; text-align:left; font-size:13px; font-weight:900;">Status</th>
+            <th style="padding:12px 14px; text-align:center; font-size:13px; font-weight:900;">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for r in reservations %}
+            <tr
+              style="border-bottom:1px solid #e5e7eb;"
+              onmouseover="this.style.background='#f9fafb';"
+              onmouseout="this.style.background='#ffffff';"
+            >
+              <td style="padding:12px 14px; font-size:14px; color:#111827;">
+                {{ r.user.username }}
+              </td>
+
+              <td style="padding:12px 14px; font-size:14px; color:#111827;">
+                {{ r.ticket_type.name }}
+              </td>
+
+              <td style="padding:12px 14px; font-size:14px; color:#111827;">
+                {{ r.quantity }}
+              </td>
+
+              <td style="padding:12px 14px; font-size:14px;">
+                {% if r.confirmed %}
+                  <span style="display:inline-block; padding:4px 10px; border-radius:999px; font-weight:900; font-size:12px; background:rgba(16,185,129,0.12); color:#059669; border:1px solid rgba(16,185,129,0.25);">
+                    Confirmed
+                  </span>
+                {% else %}
+                  <span style="display:inline-block; padding:4px 10px; border-radius:999px; font-weight:900; font-size:12px; background:rgba(245,158,11,0.14); color:#d97706; border:1px solid rgba(245,158,11,0.25);">
+                    Pending
+                  </span>
+                {% endif %}
+              </td>
+
+              <td style="padding:12px 14px; text-align:center; white-space:nowrap;">
+                <form method="post" style="display:inline-block; margin:0;">
+                  {% csrf_token %}
+                  <input type="hidden" name="reservation_id" value="{{ r.id }}">
+                  <button
+                    name="action"
+                    value="confirm"
+                    type="submit"
+                    style="background:#22c55e; color:#ffffff; padding:8px 10px; border-radius:12px; border:none; font-size:13px; font-weight:900; cursor:pointer; transition:opacity 0.2s ease;"
+                    onmouseover="this.style.opacity='0.88';"
+                    onmouseout="this.style.opacity='1';"
+                  >
+                    Confirm
+                  </button>
+                </form>
+
+                <form
+                  method="post"
+                  style="display:inline-block; margin:0 0 0 8px;"
+                  onsubmit="return confirm('Are you sure you want to delete this reservation?');"
+                >
+                  {% csrf_token %}
+                  <input type="hidden" name="reservation_id" value="{{ r.id }}">
+                  <button
+                    name="action"
+                    value="delete"
+                    type="submit"
+                    style="background:#ef4444; color:#ffffff; padding:8px 10px; border-radius:12px; border:none; font-size:13px; font-weight:900; cursor:pointer; transition:opacity 0.2s ease;"
+                    onmouseover="this.style.opacity='0.88';"
+                    onmouseout="this.style.opacity='1';"
+                  >
+                    Delete
+                  </button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p style="text-align:center; color:#6b7280; margin:12px 0 0;">
+      There are no reservations for this event.
+    </p>
+  {% endif %}
+
+  <div style="text-align:center; margin-top:20px;">
+    <a
+      href="{% url 'events:edit_event' event.id %}"
+      style="display:inline-block; text-decoration:none; background:#f3f4f6; color:#374151; padding:10px 14px; border-radius:14px; font-weight:900; border:1px solid #e5e7eb; transition:opacity 0.2s ease;"
+      onmouseover="this.style.opacity='0.88';"
+      onmouseout="this.style.opacity='1';"
+    >
+      🔙 Back to editing
+    </a>
+  </div>
+</section>
+
+{% endblock %}
+

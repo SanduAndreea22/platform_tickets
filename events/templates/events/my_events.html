@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}My events - TicketPlatform{% endblock %}
+{% block content %}
+
+<section style="max-width:1100px; margin:0 auto; padding:38px 16px;">
+  <h1 style="margin:0 0 22px; font-size:28px; font-weight:800; color:#2563eb; text-align:center;">
+    📋 My events
+  </h1>
+
+  {% if events %}
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:18px;">
+      {% for event in events %}
+        <div
+          style="background:#ffffff; border-radius:18px; overflow:hidden; border:1px solid #e5e7eb; box-shadow:0 10px 26px rgba(0,0,0,0.06); transform:translateY(0); transition:transform 0.2s ease, box-shadow 0.2s ease;"
+          onmouseover="this.style.transform='translateY(-6px)'; this.style.boxShadow='0 16px 34px rgba(0,0,0,0.10)';"
+          onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 26px rgba(0,0,0,0.06)';"
+        >
+          {% if event.image %}
+            <img src="{{ event.image.url }}" alt="{{ event.title }}" style="height:170px; width:100%; object-fit:cover; display:block;">
+          {% endif %}
+
+          <div style="padding:18px;">
+            <h2 style="margin:0 0 8px; font-size:18px; font-weight:800; color:#2563eb; line-height:1.2;">
+              {{ event.title }}
+            </h2>
+
+            <p style="margin:0 0 4px; color:#4b5563;">
+              📍 {{ event.location }}
+            </p>
+
+            <p style="margin:0 0 14px; color:#6b7280; font-size:13px;">
+              🗓️ {{ event.start_date|date:"d M Y H:i" }}
+            </p>
+
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+              <a
+                href="{% url 'events:edit_event' event.id %}"
+                style="text-decoration:none; background:#f59e0b; color:#ffffff; padding:8px 10px; border-radius:12px; font-size:13px; font-weight:800; display:inline-block;"
+                onmouseover="this.style.opacity='0.88';"
+                onmouseout="this.style.opacity='1';"
+              >
+                ✏️ Edit
+              </a>
+
+              <a
+                href="{% url 'events:customize_event' event.id %}"
+                style="text-decoration:none; background:#22c55e; color:#ffffff; padding:8px 10px; border-radius:12px; font-size:13px; font-weight:800; display:inline-block;"
+                onmouseover="this.style.opacity='0.88';"
+                onmouseout="this.style.opacity='1';"
+              >
+                🎨 Customize
+              </a>
+
+              <a
+                href="{% url 'events:ticket_management' event.id %}"
+                style="text-decoration:none; background:#7c3aed; color:#ffffff; padding:8px 10px; border-radius:12px; font-size:13px; font-weight:800; display:inline-block;"
+                onmouseover="this.style.opacity='0.88';"
+                onmouseout="this.style.opacity='1';"
+              >
+                🎟️ Tickets
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+  {% else %}
+    <div style="text-align:center; background:#ffffff; border-radius:18px; border:1px solid #e5e7eb; box-shadow:0 10px 26px rgba(0,0,0,0.06); padding:44px 16px;">
+      <p style="margin:0 0 14px; color:#4b5563; font-size:16px;">
+        You haven’t created any events yet.
+      </p>
+
+      <a
+        href="{% url 'events:create_event' %}"
+        style="text-decoration:none; background:#2563eb; color:#ffffff; padding:12px 16px; border-radius:14px; font-weight:900; display:inline-block;"
+        onmouseover="this.style.background='#1d4ed8';"
+        onmouseout="this.style.background='#2563eb';"
+      >
+        ➕ Create your first event
+      </a>
+    </div>
+  {% endif %}
+</section>
+
+{% endblock %}
