@@ -3,7 +3,8 @@ from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
-
+import uuid
+from django.db.models import Sum
 
 # ====================================
 # 🎟️ MODEL: Event
@@ -79,6 +80,27 @@ class Event(models.Model):
     @property
     def available_tickets(self):
         return sum(t.available_quantity for t in self.ticket_types.all())
+
+    @property
+    def total_capacity(self):
+        # Capacitatea totală a evenimentului
+        return sum(t.total_quantity for t in self.ticket_types.all())
+
+    @property
+    def tickets_sold(self):
+        # Doar biletele din rezervările confirmate (plătite)
+         return self.ticket_types.aggregate(
+            sold=Sum(models.F('total_quantity') - models.F('available_quantity'))
+        )['sold'] or 0
+
+    @property
+    def total_revenue(self):
+        # Calculăm banii strânși (doar din ce e confirmat)
+        return sum(
+            res.total_price for res in Reservation.objects.filter(
+                ticket_type__event=self, confirmed=True
+            )
+        )
 
 
 # ====================================
@@ -161,6 +183,19 @@ class Reservation(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
     confirmed = models.BooleanField(default=False)
+    ticket_code = models.CharField(
+        max_length=12,
+        unique=True,
+        editable=False,
+        null=True,
+        blank=True
+    )
+
+    def save(self, *args, **kwargs):
+        if not self.ticket_code:
+            # Generăm un cod scurt de 8 caractere (ex: ET-A1B2C3)
+            self.ticket_code = f"ET-{uuid.uuid4().hex[:8].upper()}"
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Rezervare"

@@ -4,7 +4,6 @@
 
 <section style="padding:10px 0 0;">
 
-  <!-- Header card -->
   <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:18px; padding:18px; box-shadow:0 10px 26px rgba(0,0,0,0.06);">
     <h1 style="margin:0 0 6px; font-size:26px; font-weight:900; color:#2563eb; text-align:center;">
       🎟️ My tickets
@@ -22,7 +21,6 @@
              onmouseover="this.style.transform='translateY(-6px)'; this.style.boxShadow='0 16px 34px rgba(0,0,0,0.10)';"
              onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 26px rgba(0,0,0,0.06)';">
 
-          <!-- Event image -->
           {% if ticket.ticket_type.event.image %}
             <img src="{{ ticket.ticket_type.event.image.url }}" alt="{{ ticket.ticket_type.event.title }}" style="width:100%; height:170px; object-fit:cover; display:block;">
           {% else %}
@@ -45,21 +43,23 @@
                 <i class="fa-solid fa-calendar" style="color:#6b7280;"></i>
                 <span>{{ ticket.ticket_type.event.start_date|date:"d M Y H:i" }}</span>
               </span>
-
-              <span style="display:flex; gap:8px; align-items:center;">
-                <i class="fa-solid fa-clock" style="color:#6b7280;"></i>
-                <span>Booked on: {{ ticket.created_at|date:"d M Y H:i" }}</span>
-              </span>
             </div>
 
             <div style="margin-top:12px; border-top:1px solid #e5e7eb; padding-top:12px;">
               <p style="margin:0 0 10px; color:#111827; font-size:14px;">
-                Ticket category: <b>{{ ticket.ticket_type.name }}</b>
+                Category: <b>{{ ticket.ticket_type.name }}</b>
               </p>
 
-              <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
-                <span style="color:#374151; font-size:14px;">Quantity: <b>{{ ticket.quantity }}</b></span>
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom: 12px;">
+                <span style="color:#374151; font-size:14px;">Qty: <b>{{ ticket.quantity }}</b></span>
                 <span style="color:#111827; font-weight:900;">{{ ticket.ticket_type.price }} EUR</span>
+              </div>
+
+              <div style="background:#f8fafc; border:2px dashed #2563eb; padding:12px; border-radius:14px; text-align:center; margin-top:10px;">
+                <p style="margin:0; color:#2563eb; font-size:10px; font-weight:900; text-transform:uppercase; letter-spacing:1px;">Validation Code</p>
+                <h3 style="margin:4px 0 0; font-family:'Courier New', monospace; font-size:18px; color:#1e40af; letter-spacing:2px;">
+                  {{ ticket.ticket_code }}
+                </h3>
               </div>
             </div>
 
@@ -92,8 +92,6 @@
 
 </section>
 
-<!-- Icons (optional if already included in base.html) -->
 <script src="https://kit.fontawesome.com/4b4e94b96e.js" crossorigin="anonymous"></script>
 
 {% endblock %}
-

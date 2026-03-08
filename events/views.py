@@ -208,15 +208,30 @@ def edit_event(request, event_id):
     return render(request, "events/edit_event.html", {"event": event})
 
 @login_required
+@login_required
 def ticket_management(request, event_id):
-    event = get_object_or_404(Event, id=event_id, organizer=request.user)
+    # Luăm evenimentul și pre-încărcăm tipurile de bilete pentru performanță (Analytics)
+    event = get_object_or_404(
+        Event.objects.prefetch_related("ticket_types"),
+        id=event_id,
+        organizer=request.user
+    )
+
+    # Luăm toate rezervările și aducem datele utilizatorului dintr-o singură interogare
     reservations = Reservation.objects.filter(
         ticket_type__event=event
     ).select_related("user", "ticket_type")
 
+    # Aici folosim proprietățile create în modelul Event:
+    # event.total_revenue -> vine direct din calculul de model
+    # event.tickets_sold -> vine din aggregate-ul de model
+    # event.total_capacity -> vine din suma total_quantity
+
     return render(request, "events/ticket_management.html", {
         "event": event,
         "reservations": reservations,
+        # Nu mai trebuie să calculăm aici nimic,
+        # pentru că template-ul va apela direct {{ event.total_revenue }}
     })
 
 @login_required

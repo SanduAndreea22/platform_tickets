@@ -6,20 +6,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}TicketPlatform{% endblock %}</title>
 
-  <!-- Fonts & Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <!-- Global CSS -->
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
   {% block extra_css %}{% endblock %}
 </head>
 
 <body>
-  <header class="site-header">
+  <header class="site-header" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 5%;">
     <div class="brand">
-      <a href="{% url 'pages:home' %}" class="brand-link">
-        <img src="{% static 'events/img/logo.png' %}" alt="Logo" class="brand-logo">
+      <a href="{% url 'pages:home' %}" class="brand-link" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
+        <img src="{% static 'events/img/logo.png' %}" alt="Logo" class="brand-logo" style="height: 40px; width: auto; object-fit: contain; margin-right: 10px;">
         <strong class="brand-name">TicketPlatform</strong>
       </a>
     </div>
@@ -29,7 +27,7 @@
     </button>
 
     <nav id="navbar" class="navbar">
-      <ul id="navLinks" class="nav-links">
+      <ul id="navLinks" class="nav-links" style="display: flex; list-style: none; gap: 15px; margin: 0; padding: 0; align-items: center;">
 
         <li><a href="{% url 'events:events_list' %}" class="nav-link">Events</a></li>
         <li><a href="{% url 'pages:about' %}" class="nav-link">About</a></li>

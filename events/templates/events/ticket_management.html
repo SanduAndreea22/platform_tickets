@@ -6,6 +6,23 @@
     🎟️ Ticket management — {{ event.title }}
   </h1>
 
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 30px;">
+    <div style="background: #ffffff; padding: 20px; border-radius: 16px; border: 1px solid #e5e7eb; box-shadow: 0 4px 12px rgba(0,0,0,0.03); text-align: center;">
+      <p style="margin: 0; font-size: 14px; color: #6b7280; font-weight: 900; text-transform: uppercase;">Venit Total</p>
+      <h2 style="margin: 8px 0 0; font-size: 24px; color: #10b981;">{{ event.total_revenue }} LEI</h2>
+    </div>
+
+    <div style="background: #ffffff; padding: 20px; border-radius: 16px; border: 1px solid #e5e7eb; box-shadow: 0 4px 12px rgba(0,0,0,0.03); text-align: center;">
+      <p style="margin: 0; font-size: 14px; color: #6b7280; font-weight: 900; text-transform: uppercase;">Grad Ocupare</p>
+      <h2 style="margin: 8px 0 0; font-size: 24px; color: #2563eb;">{{ event.tickets_sold }} / {{ event.total_capacity }}</h2>
+    </div>
+
+    <div style="background: #ffffff; padding: 20px; border-radius: 16px; border: 1px solid #e5e7eb; box-shadow: 0 4px 12px rgba(0,0,0,0.03); text-align: center;">
+      <p style="margin: 0; font-size: 14px; color: #6b7280; font-weight: 900; text-transform: uppercase;">Disponibile</p>
+      <h2 style="margin: 8px 0 0; font-size: 24px; color: #f59e0b;">{{ event.available_tickets }}</h2>
+    </div>
+  </div>
+
   {% if reservations %}
     <div style="width:100%; overflow-x:auto; border-radius:16px;">
       <table style="min-width:900px; width:100%; border-collapse:separate; border-spacing:0; background:#ffffff; border:1px solid #e5e7eb; border-radius:16px; box-shadow:0 10px 26px rgba(0,0,0,0.06); overflow:hidden;">
@@ -14,6 +31,7 @@
             <th style="padding:12px 14px; text-align:left; font-size:13px; font-weight:900;">Participant</th>
             <th style="padding:12px 14px; text-align:left; font-size:13px; font-weight:900;">Ticket type</th>
             <th style="padding:12px 14px; text-align:left; font-size:13px; font-weight:900;">Quantity</th>
+            <th style="padding:12px 14px; text-align:left; font-size:13px; font-weight:900;">Ticket Code</th>
             <th style="padding:12px 14px; text-align:left; font-size:13px; font-weight:900;">Status</th>
             <th style="padding:12px 14px; text-align:center; font-size:13px; font-weight:900;">Actions</th>
           </tr>
@@ -38,6 +56,14 @@
                 {{ r.quantity }}
               </td>
 
+              <td style="padding:12px 14px; font-size:14px; font-family:monospace; font-weight:bold; color:#2563eb;">
+                {% if r.confirmed %}
+                  {{ r.ticket_code }}
+                {% else %}
+                  <span style="color: #9ca3af; font-weight: normal;">N/A</span>
+                {% endif %}
+              </td>
+
               <td style="padding:12px 14px; font-size:14px;">
                 {% if r.confirmed %}
                   <span style="display:inline-block; padding:4px 10px; border-radius:999px; font-weight:900; font-size:12px; background:rgba(16,185,129,0.12); color:#059669; border:1px solid rgba(16,185,129,0.25);">
@@ -51,6 +77,7 @@
               </td>
 
               <td style="padding:12px 14px; text-align:center; white-space:nowrap;">
+                {% if not r.confirmed %}
                 <form method="post" style="display:inline-block; margin:0;">
                   {% csrf_token %}
                   <input type="hidden" name="reservation_id" value="{{ r.id }}">
@@ -65,6 +92,7 @@
                     Confirm
                   </button>
                 </form>
+                {% endif %}
 
                 <form
                   method="post"
@@ -109,4 +137,3 @@
 </section>
 
 {% endblock %}
-
