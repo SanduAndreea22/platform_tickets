@@ -47,21 +47,22 @@
         </span>
       </div>
 
-      <label>User role</label>
+      <label class="main-label">User role</label>
+<div class="role-group-classic">
 
-      <div class="role-group">
+  <div class="role-item">
+    <input type="radio" id="participant" name="role" value="participant" checked>
+    <label for="participant">🎟️ Participant</label>
+  </div>
 
-        <label class="role-option">
-          <input type="radio" name="role" value="participant" checked>
-          <span>🎟️ Participant</span>
-        </label>
+  <div class="role-item">
+    <input type="radio" id="organizer" name="role" value="organizer">
+    <label for="organizer">🧑‍💼 Organizer</label>
+  </div>
 
-        <label class="role-option">
-          <input type="radio" name="role" value="organizer">
-          <span>🧑‍💼 Organizer</span>
-        </label>
+</div>
 
-      </div>
+
 
       <button type="submit" class="btn-primary">
         Create account

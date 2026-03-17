@@ -6,8 +6,8 @@ class CustomUser(AbstractUser):
     is_organizer = models.BooleanField(default=False)
 
     class Meta:
-        verbose_name = "Utilizator"
-        verbose_name_plural = "Utilizatori"
+        verbose_name = "User"
+        verbose_name_plural = "Users"
         ordering = ["username"]
 
     def __str__(self):

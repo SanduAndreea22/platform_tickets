@@ -13,9 +13,7 @@
 
   <!-- HERO -->
   <div class="event-hero">
-
     <div class="event-cover">
-
       {% if event.image %}
         <img src="{{ event.image.url }}" alt="{{ event.title }}">
       {% else %}
@@ -24,16 +22,13 @@
 
       <div class="event-overlay">
         <h1>{{ event.title }}</h1>
-
         {% if event.banner_text %}
         <p>{{ event.banner_text }}</p>
         {% endif %}
       </div>
-
     </div>
 
     <div class="event-description">
-
       <p>{{ event.description }}</p>
 
       {% if event.promo_message %}
@@ -43,7 +38,6 @@
       {% endif %}
 
       <div class="event-info">
-
         <div class="event-info-box">
           <i class="fa-solid fa-location-dot"></i>
           <span><b>Location:</b> {{ event.location }}</span>
@@ -58,26 +52,20 @@
           <i class="fa-solid fa-flag-checkered"></i>
           <span><b>Ends:</b> {{ event.end_date|date:"d M Y H:i" }}</span>
         </div>
-
       </div>
-
     </div>
-
   </div>
 
   <!-- TICKETS -->
   <div class="tickets-card">
-
     <div class="tickets-header">
       <h2>Ticket types</h2>
       <span>Prices shown in EUR</span>
     </div>
 
     <div class="tickets-grid">
-
       {% for ticket in event.ticket_types.all %}
       <div class="ticket-card">
-
         <h3>{{ ticket.name }}</h3>
 
         <div class="ticket-row">
@@ -91,7 +79,6 @@
         </div>
 
         {% if user.is_authenticated and user.is_participant %}
-
         <form method="post" class="ticket-form">
           {% csrf_token %}
           <input type="hidden" name="ticket_id" value="{{ ticket.id }}">
@@ -107,25 +94,19 @@
           <button type="submit" style="background:{{ event.theme_color }}">
             Reserve now
           </button>
-
         </form>
-
         {% else %}
         <p class="ticket-login">
           Log in as a participant to reserve tickets.
         </p>
         {% endif %}
-
       </div>
-
       {% empty %}
       <div class="tickets-empty">
         No tickets available.
       </div>
       {% endfor %}
-
     </div>
-
   </div>
 
 </section>

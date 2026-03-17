@@ -12,7 +12,7 @@ User = get_user_model()
 # ============================
 def register(request):
     if request.user.is_authenticated:
-        messages.info(request, "Ești deja autentificat.")
+        messages.info(request, "You are already logged in.")
         return redirect("users:profile")
 
     if request.method == "POST":
@@ -21,31 +21,31 @@ def register(request):
         password = request.POST.get("password")
         role = request.POST.get("role")
 
-        # Validări manuale îmbunătățite
+        # Improved manual validations
         if len(username) < 4:
-            messages.error(request, "Numele de utilizator trebuie să aibă minim 4 caractere.")
+            messages.error(request, "Username must be at least 4 characters long.")
             return redirect("users:register")
 
         if User.objects.filter(username=username).exists():
-            messages.error(request, "Acest nume de utilizator este deja folosit.")
+            messages.error(request, "This username is already taken.")
             return redirect("users:register")
 
         if User.objects.filter(email=email).exists():
-            messages.error(request, "Acest email este deja folosit.")
+            messages.error(request, "This email is already in use.")
             return redirect("users:register")
 
         if len(password) < 6:
-            messages.error(request, "Parola trebuie să aibă minim 6 caractere.")
+            messages.error(request, "Password must be at least 6 characters long.")
             return redirect("users:register")
 
-        # Crearea utilizatorului
+        # Create user
         user = User.objects.create_user(
             username=username,
             email=email,
             password=password
         )
 
-        # Rolul utilizatorului
+        # User role
         if role == "organizer":
             user.is_organizer = True
             user.is_participant = False
@@ -55,7 +55,7 @@ def register(request):
 
         user.save()
 
-        messages.success(request, "Cont creat cu succes! Te poți autentifica acum.")
+        messages.success(request, "Account created successfully! You can now log in.")
         return redirect("users:login")
 
     return render(request, "users/register.html")
@@ -76,10 +76,10 @@ def user_login(request):
 
         if user is not None:
             login(request, user)
-            messages.success(request, f"Bine ai revenit, {user.username}!")
+            messages.success(request, f"Welcome back, {user.username}!")
             return redirect("users:profile")
         else:
-            messages.error(request, "Nume de utilizator sau parolă incorectă.")
+            messages.error(request, "Incorrect username or password.")
 
     return render(request, "users/login.html")
 
@@ -100,6 +100,5 @@ def profile(request):
 @login_required
 def user_logout(request):
     logout(request)
-    messages.info(request, "Te-ai deconectat cu succes.")
+    messages.info(request, "You have logged out successfully.")
     return redirect("users:login")
-

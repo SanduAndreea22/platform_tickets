@@ -1,0 +1,139 @@
+/* My Events Section */
+.my-events-section {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 38px 16px;
+}
+
+.my-events-title {
+  text-align: center;
+  font-size: 32px;
+  font-weight: 900;
+  margin-bottom: 22px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Events grid */
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+/* Event Card */
+.event-card {
+  background: var(--surface);
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.06);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.event-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(99,102,241,.35);
+  box-shadow: 0 16px 30px rgba(15,23,42,.12);
+}
+
+/* Event Image */
+.event-image {
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+}
+
+/* Event Content */
+.event-content {
+  padding: 18px;
+}
+
+.event-title {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--primary);
+}
+
+.event-location,
+.event-date {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* Buttons */
+.event-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 800;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.edit-btn {
+  background: #f59e0b;
+  color: #fff;
+}
+.edit-btn:hover { opacity: 0.88; }
+
+.customize-btn {
+  background: #22c55e;
+  color: #fff;
+}
+.customize-btn:hover { opacity: 0.88; }
+
+.tickets-btn {
+  background: #7c3aed;
+  color: #fff;
+}
+.tickets-btn:hover { opacity: 0.88; }
+
+.create-btn {
+  background: var(--primary);
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-weight: 900;
+  display: inline-block;
+  margin-top: 12px;
+}
+.create-btn:hover {
+  background: var(--primary-dark);
+}
+
+/* No events */
+.no-events {
+  text-align: center;
+  background: var(--surface);
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  padding: 44px 16px;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.06);
+}
+
+.no-events p {
+  font-size: 16px;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+
+/* Responsive */
+@media (max-width: 860px) {
+  .events-grid {
+    grid-template-columns: 1fr;
+  }
+}

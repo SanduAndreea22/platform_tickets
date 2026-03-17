@@ -61,6 +61,13 @@
                   {{ ticket.ticket_code }}
                 </h3>
               </div>
+
+              <!-- Buton descărcare PDF -->
+              <a href="{% url 'events:download_ticket_pdf' ticket.id %}"
+                 style="margin-top:10px; display:block; text-decoration:none; text-align:center; padding:10px; background:#2563eb; border-radius:12px; color:#ffffff; font-weight:900;">
+                📄 Download PDF
+              </a>
+
             </div>
 
             <a href="{% url 'events:event_detail' ticket.ticket_type.event.id %}"

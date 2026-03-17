@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import ContactForm
 from .models import SupportMessage
-
+from django.shortcuts import render
+from django.utils import timezone
+from events.models import Event
 
 def contact(request):
     if request.method == "POST":
@@ -39,13 +41,6 @@ def privacy(request):
 
 def partners(request):
     return render(request, "pages/partners.html")
-
-
-from django.shortcuts import render
-from django.utils import timezone
-from events.models import Event
-
-
 
 def home(request):
     now = timezone.now()
