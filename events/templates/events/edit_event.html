@@ -17,37 +17,32 @@
     <form method="post" enctype="multipart/form-data" class="create-event-form">
       {% csrf_token %}
 
-      <!-- Title -->
       <div class="form-group">
         <label>Title</label>
         <input type="text" name="title" value="{{ event.title }}">
       </div>
 
-      <!-- Description -->
       <div class="form-group">
         <label>Description</label>
         <textarea name="description" rows="5">{{ event.description }}</textarea>
       </div>
 
-      <!-- Location -->
       <div class="form-group">
         <label>Location</label>
         <input type="text" name="location" value="{{ event.location }}">
       </div>
 
-      <!-- Start & End Dates -->
       <div class="form-grid">
-        <div>
+        <div class="form-group">
           <label>Start date</label>
           <input type="datetime-local" name="start_date" value="{{ event.start_date|date:'Y-m-d\\TH:i' }}">
         </div>
-        <div>
+        <div class="form-group">
           <label>End date</label>
           <input type="datetime-local" name="end_date" value="{{ event.end_date|date:'Y-m-d\\TH:i' }}">
         </div>
       </div>
 
-      <!-- Image -->
       <div class="form-group">
         <label>Image (optional)</label>
         <input type="file" name="image" accept="image/*">
@@ -56,10 +51,9 @@
         {% endif %}
       </div>
 
-      <hr style="border:none; border-top:1px solid #e5e7eb; margin:6px 0;">
+      <hr class="form-divider">
 
-      <!-- Tickets -->
-      <div>
+      <div class="form-group">
         <h3 class="create-event-subtitle">🎟️ Ticket types</h3>
         <p class="form-hint">Edit existing ticket types below.</p>
 
@@ -75,8 +69,7 @@
         </div>
       </div>
 
-      <!-- Submit -->
-      <div style="text-align:center; margin-top:12px;">
+      <div class="form-center">
         <button type="submit" class="create-event-btn">Save changes</button>
       </div>
 

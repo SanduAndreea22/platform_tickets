@@ -1,86 +1,256 @@
-/* event_detail.css */
-
 .event-section {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 20px 16px 40px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-/* HERO AREA */
+/* HERO */
 .event-hero {
-    border-radius: var(--radius);
-    overflow: hidden;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    box-shadow: var(--shadow);
-    margin-bottom: 24px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background:
+    radial-gradient(1200px 500px at 10% 0%, rgba(99,102,241,.18), transparent 55%),
+    radial-gradient(900px 500px at 90% 10%, rgba(236,72,153,.16), transparent 60%),
+    var(--surface);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.06);
 }
 
+/* IMAGE */
 .event-cover {
-    background: #111827; /* Fundal închis dacă imaginea nu se încarcă */
-    min-height: 250px;
+  position: relative;
+  background: #111827;
 }
 
 .event-cover img {
-    width: 100%;
-    max-height: 400px;
-    object-fit: cover;
-    display: block;
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  display: block;
 }
 
-/* FIX PENTRU CASETELE ALBE (Location, Date) */
-/* Scoate fundalul alb de la casetele de info */
-.event-info-box {
-    background: var(--bg) !important; /* Forțează fundalul închis din tema ta */
-    color: var(--text) !important;    /* Forțează textul tău gri/alb */
-    border: 1px solid var(--border);
+/* OVERLAY */
+.event-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 24px;
+  background: linear-gradient(to top, rgba(15,23,42,.85), transparent);
 }
 
-.event-info-box {
-    flex: 1;
-    min-width: 200px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 16px;
-
-    /* AICI E REZOLVARE: folosim fundalul închis din variabila ta */
-    background: var(--bg) !important;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-
-    /* Forțăm culoarea textului să fie cea definită în temă */
-    color: var(--text) !important;
+.event-overlay h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 900;
+  color: #fff;
 }
 
-/* Scoate fundalul alb de la casetele de info */
-.event-info-box {
-    background: var(--bg) !important; /* Forțează fundalul închis din tema ta */
-    color: var(--text) !important;    /* Forțează textul tău gri/alb */
-    border: 1px solid var(--border);
+.event-overlay p {
+  margin: 8px 0 0;
+  color: rgba(255,255,255,.85);
+  font-size: 14px;
 }
 
-/* FIX PENTRU CARDUL DE BILETE */
-.tickets-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 24px;
-    color: var(--text);
+/* DESCRIPTION */
+.event-description {
+  padding: 20px;
 }
 
-.ticket-card {
-    background: var(--bg); /* Un pic mai închis decât cardul principal */
-    border: 1px solid var(--border);
-    padding: 16px;
-    border-radius: 12px;
+.event-description > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
 }
 
+/* PROMO */
 .event-promo {
-    background: var(--primary);
-    color: #fff;
-    padding: 8px 16px;
-    border-radius: 10px;
-    display: inline-block;
-    margin: 10px 0;
+  margin-top: 12px;
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  color: #fff;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+}
+
+/* INFO BOXES */
+.event-info {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.event-info-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+  color: var(--text);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.event-info-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 18px rgba(15,23,42,.08);
+}
+
+.event-info-box i {
+  color: var(--primary);
+}
+
+.event-info-box span {
+  font-size: 13px;
+}
+
+/* TICKETS CARD */
+.tickets-card {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 22px;
+  background:
+    radial-gradient(900px 400px at 10% 0%, rgba(99,102,241,.14), transparent 55%),
+    radial-gradient(700px 400px at 90% 10%, rgba(236,72,153,.12), transparent 60%),
+    var(--surface);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.06);
+}
+
+/* HEADER */
+.tickets-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.tickets-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 900;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.tickets-header span {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* GRID */
+.tickets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+/* TICKET CARD */
+.ticket-card {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  background: rgba(255,255,255,0.02);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.ticket-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 20px rgba(15,23,42,.08);
+}
+
+.ticket-card h3 {
+  margin: 0 0 10px;
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--text);
+}
+
+/* ROW */
+.ticket-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.ticket-row b {
+  color: var(--text);
+}
+
+/* FORM */
+.ticket-form {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ticket-form input {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+  color: var(--text);
+}
+
+/* BUTTON (GRADIENT FIX FINAL) */
+.ticket-form button {
+  border: none;
+  border-radius: 12px;
+  padding: 11px;
+  font-weight: 900;
+  color: #fff;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.ticket-form button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(236,72,153,.25);
+}
+
+/* LOGIN / EMPTY */
+.ticket-login,
+.tickets-empty {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.tickets-empty {
+  grid-column: 1 / -1;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .event-cover img {
+    height: 240px;
+  }
+
+  .event-overlay h1 {
+    font-size: 24px;
+  }
+
+  .tickets-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
 }

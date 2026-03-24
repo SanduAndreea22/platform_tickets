@@ -390,14 +390,19 @@ def stripe_webhook(request):
 
 import io
 import qrcode
-from reportlab.pdfgen import canvas
+
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
+from reportlab.pdfgen import canvas
 
 
 @login_required
 def download_ticket_pdf(request, reservation_id):
-    # Verifică dacă rezervarea există și e confirmată
     reservation = get_object_or_404(
         Reservation,
         id=reservation_id,
@@ -405,60 +410,137 @@ def download_ticket_pdf(request, reservation_id):
         confirmed=True
     )
 
-    # 1️⃣ Creează QR Code
-    qr = qrcode.QRCode(box_size=8, border=4)
+    event = reservation.ticket_type.event
+    attendee_name = reservation.user.get_full_name() or reservation.user.username
+    event_start = timezone.localtime(event.start_date)
+
+    # Brand colors
+    primary_rgb = (99 / 255, 102 / 255, 241 / 255)      # indigo
+    accent_rgb = (236 / 255, 72 / 255, 153 / 255)       # pink
+    text_rgb = (17 / 255, 24 / 255, 39 / 255)           # slate-900
+    muted_rgb = (107 / 255, 114 / 255, 128 / 255)       # gray-500
+    border_rgb = (229 / 255, 231 / 255, 235 / 255)      # gray-200
+    bg_rgb = (248 / 255, 250 / 255, 252 / 255)          # slate-50
+    white_rgb = (1, 1, 1)
+
+    # Create QR
+    qr = qrcode.QRCode(box_size=8, border=2)
     qr.add_data(reservation.ticket_code)
     qr.make(fit=True)
-    img = qr.make_image(fill_color="#1e3a8a", back_color="#f3f4f6")  # QR albastru pe fundal deschis
+    qr_img = qr.make_image(fill_color="#1e1b4b", back_color="white")
 
-    # 2️⃣ Creează PDF
+    # PDF
     buffer = io.BytesIO()
-    p = canvas.Canvas(buffer, pagesize=A4)
+    pdf = canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
 
-    # Background color (optional)
-    p.setFillColorRGB(0.95, 0.95, 0.97)
-    p.rect(0, 0, width, height, fill=1, stroke=0)
+    # Background
+    pdf.setFillColorRGB(*bg_rgb)
+    pdf.rect(0, 0, width, height, fill=1, stroke=0)
 
-    # Header
-    p.setFont("Helvetica-Bold", 28)
-    p.setFillColor("#2563eb")
-    p.drawCentredString(width/2, height - 80, f"🎫 {reservation.ticket_type.event.title}")
+    # Main card
+    card_x = 42
+    card_y = 70
+    card_w = width - 84
+    card_h = height - 140
 
-    # Subheader
-    p.setFont("Helvetica-Bold", 16)
-    p.setFillColor("#1f2937")
-    p.drawString(50, height - 130, f"Ticket Type: {reservation.ticket_type.name}")
-    p.drawString(50, height - 155, f"Attendee: {reservation.user.get_full_name() or reservation.user.username}")
-    p.drawString(50, height - 180, f"Unique Code: {reservation.ticket_code}")
-    p.drawString(50, height - 205, f"Event Location: {reservation.ticket_type.event.location}")
-    # Convertim la ora locală
-    event_start = timezone.localtime(reservation.ticket_type.event.start_date)
+    pdf.setFillColorRGB(*white_rgb)
+    pdf.setStrokeColorRGB(*border_rgb)
+    pdf.roundRect(card_x, card_y, card_w, card_h, 18, fill=1, stroke=1)
 
-    # Afișăm în PDF
-    p.drawString(50, height - 230, f"Event Date: {event_start.strftime('%d %b %Y %H:%M')}")
-    # Draw a line separator
-    p.setStrokeColor("#2563eb")
-    p.setLineWidth(2)
-    p.line(50, height - 245, width - 50, height - 245)
+    # Top gradient-ish bands
+    pdf.setFillColorRGB(*primary_rgb)
+    pdf.roundRect(card_x, height - 150, card_w, 60, 18, fill=1, stroke=0)
 
-    # Insert QR Code
-    img_buffer = io.BytesIO()
-    img.save(img_buffer, format='PNG')
-    img_buffer.seek(0)
-    qr_size = 180
-    p.drawImage(ImageReader(img_buffer), width - qr_size - 50, height - qr_size - 300, width=qr_size, height=qr_size)
+    pdf.setFillColorRGB(*accent_rgb)
+    pdf.roundRect(card_x + card_w - 180, height - 150, 180, 60, 18, fill=1, stroke=0)
 
-    # Footer / Instructions
-    p.setFont("Helvetica-Oblique", 12)
-    p.setFillColor("#374151")
-    p.drawString(50, 50, "Please present this ticket at the event entrance.")
-    p.drawString(50, 35, "QR code will be scanned for validation.")
+    # Title
+    pdf.setFillColorRGB(1, 1, 1)
+    pdf.setFont("Helvetica-Bold", 24)
+    pdf.drawString(card_x + 24, height - 118, "Event Ticket")
 
-    p.showPage()
-    p.save()
+    # Event name
+    pdf.setFillColorRGB(*text_rgb)
+    pdf.setFont("Helvetica-Bold", 22)
+    pdf.drawString(card_x + 24, height - 195, event.title[:55])
+
+    # Subtitle
+    pdf.setFont("Helvetica", 11)
+    pdf.setFillColorRGB(*muted_rgb)
+    pdf.drawString(card_x + 24, height - 215, "Present this PDF at the event entrance for validation.")
+
+    # Divider
+    pdf.setStrokeColorRGB(*border_rgb)
+    pdf.setLineWidth(1)
+    pdf.line(card_x + 24, height - 232, card_x + card_w - 24, height - 232)
+
+    # Left info
+    label_x = card_x + 24
+    value_x = card_x + 24
+    current_y = height - 270
+
+    def draw_field(label, value, y):
+        pdf.setFont("Helvetica-Bold", 10)
+        pdf.setFillColorRGB(*muted_rgb)
+        pdf.drawString(label_x, y, label.upper())
+
+        pdf.setFont("Helvetica-Bold", 14)
+        pdf.setFillColorRGB(*text_rgb)
+        pdf.drawString(value_x, y - 18, str(value))
+        return y - 48
+
+    current_y = draw_field("Ticket Type", reservation.ticket_type.name, current_y)
+    current_y = draw_field("Attendee", attendee_name, current_y)
+    current_y = draw_field("Unique Code", reservation.ticket_code, current_y)
+    current_y = draw_field("Location", event.location, current_y)
+    current_y = draw_field("Event Date", event_start.strftime("%d %b %Y, %H:%M"), current_y)
+    current_y = draw_field("Quantity", reservation.quantity, current_y)
+
+    # QR area
+    qr_size = 170
+    qr_x = card_x + card_w - qr_size - 36
+    qr_y = height - 470
+
+    pdf.setFillColorRGB(*bg_rgb)
+    pdf.setStrokeColorRGB(*border_rgb)
+    pdf.roundRect(qr_x - 12, qr_y - 12, qr_size + 24, qr_size + 24, 16, fill=1, stroke=1)
+
+    qr_buffer = io.BytesIO()
+    qr_img.save(qr_buffer, format="PNG")
+    qr_buffer.seek(0)
+
+    pdf.drawImage(
+        ImageReader(qr_buffer),
+        qr_x,
+        qr_y,
+        width=qr_size,
+        height=qr_size
+    )
+
+    pdf.setFont("Helvetica-Bold", 10)
+    pdf.setFillColorRGB(*primary_rgb)
+    pdf.drawCentredString(qr_x + qr_size / 2, qr_y - 24, "SCAN FOR VALIDATION")
+
+    # Bottom note box
+    note_x = card_x + 24
+    note_y = card_y + 34
+    note_w = card_w - 48
+    note_h = 62
+
+    pdf.setFillColorRGB(248 / 255, 250 / 255, 252 / 255)
+    pdf.setStrokeColorRGB(*border_rgb)
+    pdf.roundRect(note_x, note_y, note_w, note_h, 14, fill=1, stroke=1)
+
+    pdf.setFont("Helvetica", 11)
+    pdf.setFillColorRGB(*muted_rgb)
+    pdf.drawString(note_x + 16, note_y + 38, "Please arrive a few minutes before the event starts.")
+    pdf.drawString(note_x + 16, note_y + 20, "Your QR code will be scanned at check-in.")
+
+    pdf.showPage()
+    pdf.save()
 
     buffer.seek(0)
     response = HttpResponse(buffer, content_type="application/pdf")
-    response['Content-Disposition'] = f'attachment; filename="ticket_{reservation.ticket_code}.pdf"'
+    response["Content-Disposition"] = f'attachment; filename="ticket_{reservation.ticket_code}.pdf"'
     return response

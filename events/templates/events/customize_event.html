@@ -19,7 +19,6 @@
     <form method="post" enctype="multipart/form-data" class="create-event-form">
       {% csrf_token %}
 
-      <!-- Banner Image -->
       <div class="form-group">
         <label>Banner image (optional)</label>
         <input type="file" name="image" accept="image/*">
@@ -29,28 +28,24 @@
         <small class="form-hint">Tip: Recommended size 1200×630 (JPG/PNG/WEBP).</small>
       </div>
 
-      <!-- Theme Color -->
       <div class="form-group">
         <label>Theme color</label>
         <input type="color" name="theme_color" value="{{ event.theme_color }}" class="color-picker">
         <small class="form-hint">This color can be used for buttons, highlights, and banners.</small>
       </div>
 
-      <!-- Banner Text -->
       <div class="form-group">
         <label>Banner text</label>
         <input type="text" name="banner_text" value="{{ event.banner_text }}" placeholder="e.g., Summer starts with music!">
       </div>
 
-      <!-- Promotional Message -->
       <div class="form-group">
         <label>Promotional message</label>
         <textarea name="promo_message" rows="4">{{ event.promo_message }}</textarea>
         <small class="form-hint">Keep it short and clear (1–2 lines works best).</small>
       </div>
 
-      <!-- Submit Button -->
-      <div class="form-group" style="text-align:center; margin-top:12px;">
+      <div class="form-center">
         <button type="submit" class="create-event-btn">Save customization</button>
       </div>
 
