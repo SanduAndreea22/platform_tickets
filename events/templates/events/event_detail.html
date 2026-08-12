@@ -60,7 +60,7 @@
   <div class="tickets-card">
     <div class="tickets-header">
       <h2>Ticket types</h2>
-      <span>Prices shown in EUR</span>
+      <span>Prices shown in {{ CURRENCY }}</span>
     </div>
 
     <div class="tickets-grid">
@@ -70,7 +70,7 @@
 
         <div class="ticket-row">
           <span>💰 Price</span>
-          <b>{{ ticket.price }} EUR</b>
+          <b>{{ ticket.price }} {{ CURRENCY }}</b>
         </div>
 
         <div class="ticket-row">

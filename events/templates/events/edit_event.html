@@ -47,7 +47,8 @@
         <label>Image (optional)</label>
         <input type="file" name="image" accept="image/*">
         {% if event.image %}
-          <div class="form-hint">Current image: <code>{{ event.image.url }}</code></div>
+          <img src="{{ event.image.url }}" alt="Current event image" class="banner-preview">
+          <small class="form-hint">Uploading a new file will replace this image.</small>
         {% endif %}
       </div>
 

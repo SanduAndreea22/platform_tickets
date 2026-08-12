@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}How This Project Works - TicketPlatform{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/legal.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="legal">
+  <div class="legal-card">
+
+    <header class="legal-header">
+      <h1 class="legal-title">⭐ About This Project</h1>
+      <p class="legal-intro">
+        TicketPlatform is a portfolio/demo project built to practice full-stack Django development —
+        event booking, Stripe payments, PDF ticket generation with QR codes, and role-based accounts.
+        It's live so you can try the real flow end-to-end, but a few things work differently than on a real ticketing site.
+      </p>
+    </header>
+
+    <div class="legal-section">
+      <h2>💳 Payments are in test mode</h2>
+      <p>
+        This project uses Stripe's <strong>test mode</strong> — no real card is charged and no real money moves.
+        To try the checkout flow, use one of Stripe's test cards, for example:
+      </p>
+      <ul>
+        <li>Card number: <strong>4242 4242 4242 4242</strong></li>
+        <li>Expiry date: any future date (e.g. 12/34)</li>
+        <li>CVC: any 3 digits</li>
+      </ul>
+      <p>
+        You'll get a real PDF ticket with a QR code afterwards — that part works exactly like it would in production.
+      </p>
+    </div>
+
+    <div class="legal-section">
+      <h2>💬 The contact form is not actively monitored</h2>
+      <p>
+        Messages sent through the <a class="legal-link" href="{% url 'pages:contact' %}">contact page</a> are saved to the
+        database, but there is no support team on the other end — this is a demo project, not a live business.
+        Feel free to test the form, just don't expect a reply.
+      </p>
+    </div>
+
+    <div class="legal-section">
+      <h2>🧑‍💻 Why this exists</h2>
+      <p>
+        This platform was built as a learning project to practice real-world features — reservations with stock
+        management, Stripe payment intents and webhooks, PDF/QR generation, and role-based access for organizers
+        and participants. Feedback and bug reports are always welcome through the contact form above.
+      </p>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

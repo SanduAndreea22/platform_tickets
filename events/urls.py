@@ -20,6 +20,7 @@ urlpatterns = [
     path('payment/create-intent/<int:reservation_id>/', views.create_payment_intent, name='create_payment_intent'),
     path('payment/success/', views.payment_success, name='payment_success'),
     path('payment/cancel/', views.payment_cancel, name='payment_cancel'),
+    path('payment/webhook/', views.stripe_webhook, name='stripe_webhook'),
 
     path('<int:pk>/', views.event_detail, name='event_detail'),
 ]

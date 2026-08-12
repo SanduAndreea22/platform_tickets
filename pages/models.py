@@ -1,8 +1,18 @@
+import uuid
+
 from django.db import models
 from django.utils import timezone
 
 
 class SupportMessage(models.Model):
+    thread_id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        db_index=True,
+        verbose_name="Conversation thread",
+        help_text="Groups messages belonging to the same visitor/conversation.",
+    )
+
     name = models.CharField(
         max_length=100,
         verbose_name="Full name"

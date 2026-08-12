@@ -2,6 +2,33 @@
   padding: 16px 0 40px;
 }
 
+.demo-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(99,102,241,.25);
+  background: rgba(99,102,241,.08);
+  color: var(--text);
+  font-size: 13px;
+  text-align: center;
+  text-decoration: none;
+  transition: background .15s ease, transform .15s ease;
+}
+
+.demo-banner:hover {
+  background: rgba(99,102,241,.14);
+  transform: translateY(-1px);
+}
+
+.demo-banner strong {
+  color: var(--primary);
+}
+
 .home-hero {
   text-align: center;
   padding: 28px 18px;
@@ -98,38 +125,7 @@
   flex-wrap: wrap;
 }
 
-/* Buttons (same style as other pages) */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  padding: 11px 16px;
-  border-radius: 14px;
-  font-weight: 900;
-  transition: transform .15s ease, box-shadow .15s ease;
-}
-
-.btn-primary {
-  color: #fff;
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-}
-
-.btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 18px rgba(79,70,229,.25);
-}
-
-.btn-ghost {
-  color: var(--text);
-  border: 1px solid var(--border);
-  background: rgba(255,255,255,0.02);
-}
-
-.btn-ghost:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 18px rgba(15,23,42,.08);
-}
+/* .btn, .btn-primary, .btn-ghost now live in base.css (shared across pages) */
 
 @media (max-width: 860px) {
   .home-grid {

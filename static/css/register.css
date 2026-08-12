@@ -85,13 +85,17 @@
 }
 
 /* Role selector */
-.role-group{
+.main-label{
+  margin-top:4px;
+}
+
+.role-group-classic{
   display:flex;
   gap:10px;
   margin-top:4px;
 }
 
-.role-option{
+.role-item{
   flex:1;
 
   display:flex;
@@ -112,13 +116,23 @@
   transition:all .15s ease;
 }
 
-.role-option:hover{
+.role-item:hover{
   border-color:var(--primary);
   background:rgba(99,102,241,.06);
 }
 
-.role-option input{
+.role-item:has(input:checked){
+  border-color:var(--primary);
+  background:rgba(99,102,241,.10);
+  box-shadow:0 0 0 1px var(--primary) inset;
+}
+
+.role-item input{
   display:none;
+}
+
+.role-item label{
+  cursor:pointer;
 }
 
 /* Button */

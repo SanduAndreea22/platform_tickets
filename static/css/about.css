@@ -4,33 +4,8 @@
   gap: 16px;
 }
 
-/* shared cards */
-.about-card,
-.about-cta-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 26px;
-  box-shadow: 0 10px 26px rgba(0,0,0,0.06);
-}
-
-.section-header {
-  text-align: center;
-  margin-bottom: 18px;
-}
-
-.section-title {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 900;
-  color: var(--text);
-}
-
-.section-subtitle {
-  margin: 8px 0 0;
-  color: var(--muted);
-  font-size: 14px;
-}
+/* .about-card, .about-cta-card, .section-header, .section-title,
+   .section-subtitle now live in base.css (shared across pages) */
 
 /* hero */
 .about-hero {
@@ -85,38 +60,7 @@
   flex-wrap: wrap;
 }
 
-/* buttons */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  padding: 10px 16px;
-  border-radius: 12px;
-  font-weight: 800;
-  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
-}
-
-.btn-primary {
-  color: #fff;
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-}
-
-.btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 18px rgba(79,70,229,.25);
-}
-
-.btn-ghost {
-  color: var(--text);
-  border: 1px solid var(--border);
-  background: rgba(255,255,255,0.02);
-}
-
-.btn-ghost:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 18px rgba(15,23,42,.08);
-}
+/* .btn, .btn-primary, .btn-ghost now live in base.css (shared across pages) */
 
 /* stats */
 .stats {
@@ -301,22 +245,7 @@
   color: var(--muted);
 }
 
-/* CTA */
-.about-cta-card {
-  text-align: center;
-  background:
-    radial-gradient(900px 500px at 50% 0%, rgba(99,102,241,.16), transparent 55%),
-    radial-gradient(900px 500px at 50% 100%, rgba(236,72,153,.12), transparent 60%),
-    var(--surface);
-}
-
-.cta-actions {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 12px;
-  flex-wrap: wrap;
-}
+/* .about-cta-card gradient background and .cta-actions now live in base.css */
 
 /* responsive */
 @media (max-width: 900px) {

@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}TicketPlatform{% endblock %}</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
@@ -35,6 +35,7 @@
         <li><a href="{% url 'pages:partners' %}" class="nav-link">Partners</a></li>
         <li><a href="{% url 'pages:terms' %}" class="nav-link">Terms</a></li>
         <li><a href="{% url 'pages:privacy' %}" class="nav-link">Privacy Policy</a></li>
+        <li><a href="{% url 'pages:how_it_works' %}" class="nav-link">⭐ How It Works</a></li>
 
         {% if user.is_authenticated %}
           {% if user.is_organizer %}
@@ -88,6 +89,10 @@
   <footer class="site-footer">
     <div class="footer-inner">
       <p>&copy; 2025 TicketPlatform — All rights reserved.</p>
+      <p style="margin-top: 6px;">
+        This is a portfolio/demo project —
+        <a href="{% url 'pages:how_it_works' %}" style="color: var(--primary); font-weight: 700; text-decoration: none;">see how it works</a>.
+      </p>
     </div>
   </footer>
 

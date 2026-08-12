@@ -1,5 +1,13 @@
-from decimal import Decimal
+import io
+import logging
+from decimal import Decimal, InvalidOperation
+
+import qrcode
 import stripe
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.utils import ImageReader
+from reportlab.pdfgen import canvas
+
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.contrib import messages
@@ -8,10 +16,14 @@ from django.db import transaction
 from django.db.models import Q
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.views.decorators.csrf import csrf_exempt
+
 from .models import Event, TicketType, Reservation, Payment
-from django.utils import timezone
+
+logger = logging.getLogger(__name__)
+
 
 def events_list(request):
     query = request.GET.get("q", "")
@@ -35,7 +47,7 @@ def events_list(request):
 
 
 def event_detail(request, pk):
-    event = get_object_or_404(Event, pk=pk)
+    event = get_object_or_404(Event.objects.prefetch_related("ticket_types"), pk=pk)
 
     if request.method == "POST":
         if not request.user.is_authenticated:
@@ -134,12 +146,20 @@ def create_event(request):
         title = request.POST.get("title")
         description = request.POST.get("description")
         location = request.POST.get("location")
-        start_date = parse_datetime(request.POST.get("start_date"))
-        end_date = parse_datetime(request.POST.get("end_date"))
         image = request.FILES.get("image")
+
+        try:
+            start_date = parse_datetime(request.POST.get("start_date") or "")
+            end_date = parse_datetime(request.POST.get("end_date") or "")
+        except ValueError:
+            start_date = end_date = None
 
         if not all([title, description, location, start_date, end_date]):
             messages.error(request, "Please fill in all fields.")
+            return redirect("events:create_event")
+
+        if len(title) > 200 or len(location) > 255:
+            messages.error(request, "Title or location is too long.")
             return redirect("events:create_event")
 
         if end_date < start_date:
@@ -163,12 +183,22 @@ def create_event(request):
         for name, price, qty in zip(names, prices, quantities):
             if not name or not price or not qty:
                 continue
+
+            try:
+                price = Decimal(price)
+                qty = int(qty)
+            except (InvalidOperation, ValueError):
+                continue
+
+            if qty <= 0 or price < 0 or len(name) > 100:
+                continue
+
             TicketType.objects.create(
                 event=event,
                 name=name,
                 price=price,
-                total_quantity=int(qty),
-                available_quantity=int(qty),
+                total_quantity=qty,
+                available_quantity=qty,
             )
 
         messages.success(request, "Event created!")
@@ -270,46 +300,56 @@ def payment_page(request, reservation_id):
         "reservation": reservation,
         "payment": payment,
         "STRIPE_PUBLIC_KEY": settings.STRIPE_PUBLIC_KEY,
-        "CURRENCY": settings.STRIPE_CURRENCY,
     })
 
 @login_required
 def create_payment_intent(request, reservation_id):
-    reservation = get_object_or_404(
-        Reservation.objects.select_for_update(),
-        id=reservation_id,
-        user=request.user
-    )
-
-    if reservation.confirmed:
-        return JsonResponse({"error": "Already paid"}, status=400)
-
-    stripe.api_key = settings.STRIPE_SECRET_KEY
-
-    # Creează sau recuperează plata
-    payment, _ = Payment.objects.get_or_create(
-        reservation=reservation,
-        defaults={"amount": reservation.total_price}
-    )
-
-    # Dacă deja există un PaymentIntent, îl reutilizăm
-    if payment.stripe_payment_intent:
-        intent = stripe.PaymentIntent.retrieve(payment.stripe_payment_intent)
-    else:
-        amount_cents = int(reservation.total_price * Decimal("100"))
-
-        intent = stripe.PaymentIntent.create(
-            amount=amount_cents,
-            currency=settings.STRIPE_CURRENCY,
-            metadata={
-                "reservation_id": reservation.id,
-                "user_id": request.user.id,
-            },
+    # select_for_update() necesita un bloc atomic activ, altfel Django
+    # ridica TransactionManagementError la fiecare apel.
+    with transaction.atomic():
+        reservation = get_object_or_404(
+            Reservation.objects.select_for_update(),
+            id=reservation_id,
+            user=request.user
         )
 
-        payment.stripe_payment_intent = intent.id
-        payment.stripe_client_secret = intent.client_secret
-        payment.save()
+        if reservation.confirmed:
+            return JsonResponse({"error": "Already paid"}, status=400)
+
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+
+        # Creează sau recuperează plata
+        payment, _ = Payment.objects.get_or_create(
+            reservation=reservation,
+            defaults={"amount": reservation.total_price}
+        )
+
+        # Dacă deja există un PaymentIntent, îl reutilizăm
+        if payment.stripe_payment_intent:
+            try:
+                intent = stripe.PaymentIntent.retrieve(payment.stripe_payment_intent)
+            except stripe.error.StripeError:
+                logger.exception("Stripe retrieve failed for payment %s", payment.id)
+                return JsonResponse({"error": "Payment provider error."}, status=502)
+        else:
+            amount_cents = int(reservation.total_price * Decimal("100"))
+
+            try:
+                intent = stripe.PaymentIntent.create(
+                    amount=amount_cents,
+                    currency=settings.STRIPE_CURRENCY,
+                    metadata={
+                        "reservation_id": reservation.id,
+                        "user_id": request.user.id,
+                    },
+                )
+            except stripe.error.StripeError:
+                logger.exception("Stripe create failed for reservation %s", reservation.id)
+                return JsonResponse({"error": "Payment provider error."}, status=502)
+
+            payment.stripe_payment_intent = intent.id
+            payment.stripe_client_secret = intent.client_secret
+            payment.save()
 
     return JsonResponse({"clientSecret": intent.client_secret})
 
@@ -321,13 +361,32 @@ def payment_success(request):
         messages.error(request, "Could not confirm payment.")
         return redirect("events:my_reservations")
 
+    # Confirmarea se face DOAR pe baza statusului real din Stripe, nu pe
+    # simpla prezenta a parametrului in URL (altfel oricine ar putea
+    # "confirma" o plata nefacuta navigand direct la acest link).
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    try:
+        intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+    except stripe.error.StripeError:
+        logger.warning("Stripe retrieve failed for intent %s (user %s)", payment_intent_id, request.user.id)
+        messages.error(request, "Could not confirm payment.")
+        return redirect("events:my_reservations")
+
+    if intent.status != "succeeded":
+        logger.warning(
+            "payment_success called with non-succeeded intent %s (status=%s, user=%s)",
+            payment_intent_id, intent.status, request.user.id,
+        )
+        messages.error(request, "Payment was not completed.")
+        return redirect("events:my_reservations")
+
     with transaction.atomic():
         # Blocăm în baza de date plata pentru a evita concurența
         payment = (
             Payment.objects
             .select_for_update()
             .select_related("reservation")
-            .filter(stripe_payment_intent=payment_intent_id)
+            .filter(stripe_payment_intent=payment_intent_id, reservation__user=request.user)
             .first()
         )
 
@@ -368,37 +427,32 @@ def stripe_webhook(request):
             payload, sig, settings.STRIPE_WEBHOOK_SECRET
         )
     except (ValueError, stripe.error.SignatureVerificationError):
+        logger.warning("Rejected webhook call with invalid signature.")
         return HttpResponse(status=400)
 
     if event["type"] == "payment_intent.succeeded":
         intent = event["data"]["object"]
         pi_id = intent["id"]
 
-        payment = Payment.objects.select_related("reservation").filter(
-            stripe_payment_intent=pi_id
-        ).first()
-        if payment and payment.status != Payment.STATUS_COMPLETED:
-            payment.status = Payment.STATUS_COMPLETED
-            payment.save()
+        with transaction.atomic():
+            payment = (
+                Payment.objects
+                .select_for_update()
+                .select_related("reservation")
+                .filter(stripe_payment_intent=pi_id)
+                .first()
+            )
+            if not payment:
+                logger.warning("Webhook: no local Payment found for intent %s", pi_id)
+            elif payment.status != Payment.STATUS_COMPLETED:
+                payment.status = Payment.STATUS_COMPLETED
+                payment.save()
 
-            reservation = payment.reservation
-            reservation.confirmed = True
-            reservation.save()
+                reservation = payment.reservation
+                reservation.confirmed = True
+                reservation.save()
 
     return HttpResponse(status=200)
-
-
-import io
-import qrcode
-
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
-from django.utils import timezone
-
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.utils import ImageReader
-from reportlab.pdfgen import canvas
 
 
 @login_required

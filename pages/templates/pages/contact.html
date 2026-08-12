@@ -31,10 +31,19 @@
           <div class="msg msg-right">
             <div class="bubble bubble-user">
               <p class="bubble-name">{{ msg.name }}</p>
-              <p class="bubble-text">{{ msg.response|default:msg.message }}</p>
+              <p class="bubble-text">{{ msg.message }}</p>
               <p class="bubble-time">{{ msg.created_at|date:"d M Y, H:i" }}</p>
             </div>
           </div>
+          {% if msg.response %}
+            <div class="msg msg-left">
+              <div class="bubble bubble-support">
+                <p class="bubble-name">Support</p>
+                <p class="bubble-text">{{ msg.response }}</p>
+                <p class="bubble-time">{{ msg.created_at|date:"d M Y, H:i" }}</p>
+              </div>
+            </div>
+          {% endif %}
         {% endif %}
       {% empty %}
         <p class="chat-empty">No messages yet. Send the first one! 💌</p>
@@ -64,6 +73,13 @@
         {{ form.message }}
         {% if form.message.errors %}
           <p class="field-error">{{ form.message.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <div class="field">
+        {{ form.captcha }}
+        {% if form.captcha.errors %}
+          <p class="field-error">{{ form.captcha.errors.0 }}</p>
         {% endif %}
       </div>
 

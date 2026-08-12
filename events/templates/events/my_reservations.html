@@ -78,13 +78,16 @@
               <div class="reservation-row">
                 <span>Quantity: <strong>{{ r.quantity }}</strong></span>
                 <span class="reservation-price">
-                  {{ r.ticket_type.price }} EUR
+                  {{ r.ticket_type.price }} {{ CURRENCY }}
                 </span>
               </div>
 
             </div>
 
             {% if not r.confirmed %}
+              <p class="reservation-expiry">
+                ⏳ Hold expires at {{ r.expires_at|date:"d M Y H:i" }} — pay before then or the tickets are released back to stock.
+              </p>
               <div class="reservation-actions">
 
                 <a href="{% url 'events:payment_page' r.id %}" class="btn btn-success">
@@ -102,7 +105,7 @@
               </div>
             {% else %}
               <div class="reservation-confirmed">
-                🎟️ Your ticket is already confirmed
+                🎟️ Your ticket is confirmed
               </div>
             {% endif %}
 

@@ -60,13 +60,13 @@
             <div class="ticket-details">
 
               <p class="ticket-category">
-                Category: <strong>{{ ticket.ticket_type.name }}</strong>
+                Ticket category: <strong>{{ ticket.ticket_type.name }}</strong>
               </p>
 
               <div class="ticket-row">
-                <span>Qty: <strong>{{ ticket.quantity }}</strong></span>
+                <span>Quantity: <strong>{{ ticket.quantity }}</strong></span>
                 <span class="ticket-price">
-                  {{ ticket.ticket_type.price }} EUR
+                  {{ ticket.ticket_type.price }} {{ CURRENCY }}
                 </span>
               </div>
 

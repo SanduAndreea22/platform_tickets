@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, MinValueValidator
@@ -5,6 +7,12 @@ from django.db import models
 from django.utils import timezone
 from django.db.models import Sum
 import uuid
+
+RESERVATION_HOLD_MINUTES = 15
+
+
+def default_reservation_expiry():
+    return timezone.now() + timedelta(minutes=RESERVATION_HOLD_MINUTES)
 
 
 # ====================================
@@ -210,6 +218,11 @@ class Reservation(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    expires_at = models.DateTimeField(
+        default=default_reservation_expiry,
+        help_text="Unconfirmed reservations past this time can be released back to stock.",
+    )
+
     ticket_code = models.CharField(
         max_length=20,
         unique=True,
@@ -247,6 +260,10 @@ class Reservation(models.Model):
     @property
     def total_price(self):
         return self.ticket_type.price * self.quantity
+
+    @property
+    def is_expired(self):
+        return not self.confirmed and timezone.now() > self.expires_at
 
     def clean(self):
         if self.quantity <= 0:

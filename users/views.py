@@ -1,3 +1,6 @@
+import logging
+
+from django.core.cache import cache
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -5,6 +8,14 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
+
+LOGIN_MAX_ATTEMPTS = 5
+LOGIN_LOCKOUT_SECONDS = 300
+
+
+def _login_attempts_key(request):
+    return f"login_attempts:{request.META.get('REMOTE_ADDR', 'unknown')}"
 
 
 # ============================
@@ -16,14 +27,18 @@ def register(request):
         return redirect("users:profile")
 
     if request.method == "POST":
-        username = request.POST.get("username", "").strip()
-        email = request.POST.get("email", "").strip().lower()
-        password = request.POST.get("password")
+        username = (request.POST.get("username") or "").strip()
+        email = (request.POST.get("email") or "").strip().lower()
+        password = request.POST.get("password") or ""
         role = request.POST.get("role")
 
         # Improved manual validations
         if len(username) < 4:
             messages.error(request, "Username must be at least 4 characters long.")
+            return redirect("users:register")
+
+        if not email:
+            messages.error(request, "Email is required.")
             return redirect("users:register")
 
         if User.objects.filter(username=username).exists():
@@ -69,16 +84,26 @@ def user_login(request):
         return redirect("users:profile")
 
     if request.method == "POST":
-        username = request.POST.get("username").strip()
-        password = request.POST.get("password")
+        attempts_key = _login_attempts_key(request)
+        attempts = cache.get(attempts_key, 0)
+
+        if attempts >= LOGIN_MAX_ATTEMPTS:
+            logger.warning("Login rate-limited for IP %s", request.META.get("REMOTE_ADDR"))
+            messages.error(request, "Too many failed attempts. Please try again in a few minutes.")
+            return render(request, "users/login.html")
+
+        username = (request.POST.get("username") or "").strip()
+        password = request.POST.get("password") or ""
 
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
+            cache.delete(attempts_key)
             login(request, user)
             messages.success(request, f"Welcome back, {user.username}!")
             return redirect("users:profile")
         else:
+            cache.set(attempts_key, attempts + 1, timeout=LOGIN_LOCKOUT_SECONDS)
             messages.error(request, "Incorrect username or password.")
 
     return render(request, "users/login.html")
