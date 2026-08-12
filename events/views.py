@@ -68,11 +68,14 @@ def event_detail(request, pk):
             messages.error(request, "Invalid quantity.")
             return redirect("events:event_detail", pk=pk)
 
-        ticket_type = get_object_or_404(TicketType, id=ticket_id, event=event)
-
         try:
             with transaction.atomic():
-                ticket_type.refresh_from_db()
+                # select_for_update() locks this row for the duration of the
+                # transaction, so two concurrent requests for the same last
+                # ticket can't both pass the stock check before either commits.
+                ticket_type = get_object_or_404(
+                    TicketType.objects.select_for_update(), id=ticket_id, event=event
+                )
                 if not ticket_type.has_stock(quantity):
                     messages.error(request, "Not enough tickets available.")
                     return redirect("events:event_detail", pk=pk)

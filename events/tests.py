@@ -1,13 +1,16 @@
 import json
+import threading
 from datetime import timedelta
 from decimal import Decimal
+from unittest import skipUnless
 from unittest.mock import MagicMock, patch
 
 import stripe
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
-from django.test import TestCase
+from django.db import connection
+from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
 from django.utils import timezone
 
@@ -261,3 +264,87 @@ class ExpireReservationsCommandTests(PaymentFlowTestsBase):
         call_command("expire_reservations")
 
         self.assertTrue(Reservation.objects.filter(id=self.reservation.id).exists())
+
+
+@skipUnless(
+    connection.vendor == "postgresql",
+    "select_for_update() row locking is only meaningfully enforced on "
+    "PostgreSQL (production/Neon here) — SQLite's has_select_for_update "
+    "is False, so Django silently skips the FOR UPDATE clause and this "
+    "test would be flaky for reasons unrelated to the fix being tested.",
+)
+class ConcurrentReservationTests(TransactionTestCase):
+    """
+    Regression test for the race condition fixed in event_detail: two
+    simultaneous requests for the same last ticket must not both succeed.
+    Uses TransactionTestCase (real, separate DB connections per thread)
+    instead of TestCase, since TestCase wraps everything in one shared
+    transaction and would hide any real locking behavior.
+    """
+
+    def setUp(self):
+        User = get_user_model()
+        self.organizer = User.objects.create_user(
+            username="org_race", password="pass", is_organizer=True
+        )
+        self.buyer_a = User.objects.create_user(
+            username="buyer_a", password="pass", is_participant=True
+        )
+        self.buyer_b = User.objects.create_user(
+            username="buyer_b", password="pass", is_participant=True
+        )
+        self.event = Event.objects.create(
+            organizer=self.organizer,
+            title="Sold Out Soon",
+            description="Desc",
+            location="Loc",
+            start_date=timezone.now() + timedelta(days=1),
+            end_date=timezone.now() + timedelta(days=2),
+        )
+        self.ticket = TicketType.objects.create(
+            event=self.event,
+            name="Last Ticket",
+            price=Decimal("50.00"),
+            total_quantity=1,
+            available_quantity=1,
+        )
+
+    def test_two_simultaneous_buyers_cannot_both_get_the_last_ticket(self):
+        barrier = threading.Barrier(2)
+        results = {}
+
+        def attempt(username, key):
+            from django.test import Client
+
+            client = Client(SERVER_NAME="127.0.0.1")
+            client.login(username=username, password="pass")
+            barrier.wait()  # line both requests up to hit the view at the same time
+            try:
+                response = client.post(
+                    reverse("events:event_detail", kwargs={"pk": self.event.id}),
+                    {"ticket_id": self.ticket.id, "quantity": 1},
+                )
+                results[key] = response
+            except Exception as exc:
+                results[key] = exc
+
+        t1 = threading.Thread(target=attempt, args=("buyer_a", "a"))
+        t2 = threading.Thread(target=attempt, args=("buyer_b", "b"))
+        t1.start()
+        t2.start()
+        t1.join(timeout=10)
+        t2.join(timeout=10)
+
+        for key, result in results.items():
+            if isinstance(result, Exception):
+                self.fail(f"Request '{key}' raised an unexpected exception: {result!r}")
+
+        confirmed_reservations = Reservation.objects.filter(ticket_type=self.ticket)
+        self.assertEqual(
+            confirmed_reservations.count(), 1,
+            "Both concurrent requests created a reservation for the single remaining ticket.",
+        )
+
+        self.ticket.refresh_from_db()
+        self.assertEqual(self.ticket.available_quantity, 0)
+        self.assertGreaterEqual(self.ticket.available_quantity, 0)
