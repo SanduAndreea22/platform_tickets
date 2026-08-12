@@ -2,19 +2,33 @@
 
 A modern event ticketing system designed to replace chaotic booking processes with structured, scalable digital workflows.
 
+🔗 **Live demo:** [platform-tickets.onrender.com](https://platform-tickets.onrender.com/) — see [How It Works](https://platform-tickets.onrender.com/how-it-works/) before you try checkout (Stripe test mode, no real charges).
+
+---
+
+## 📸 Screenshots
+
+| Home | Events list |
+|---|---|
+| ![Home page](docs/screenshots/home.jpg) | ![Events list](docs/screenshots/events-list.jpg) |
+
+| Event details & checkout | About this project |
+|---|---|
+| ![Event details](docs/screenshots/event-detail.jpg) | ![How it works](docs/screenshots/how-it-works.jpg) |
+
 ---
 
 ## ❗ The Problem
 
 Most event booking processes are still messy and inefficient:
 
-- 📱 Reservations happen through messages, calls, or spreadsheets  
-- ❌ No real-time availability tracking  
-- 🔁 Manual confirmations and constant back-and-forth  
-- 🎫 No secure or reliable ticket validation  
-- ⚠️ High risk of overbooking or lost data  
+- 📱 Reservations happen through messages, calls, or spreadsheets
+- ❌ No real-time availability tracking
+- 🔁 Manual confirmations and constant back-and-forth
+- 🎫 No secure or reliable ticket validation
+- ⚠️ High risk of overbooking or lost data
 
-For organizers, this means wasted time, stress, and lack of control.  
+For organizers, this means wasted time, stress, and lack of control.
 For users, it creates friction and uncertainty.
 
 ---
@@ -23,87 +37,81 @@ For users, it creates friction and uncertainty.
 
 TicketPlatform transforms this chaos into a clean, automated system:
 
-- Users can reserve tickets instantly
+- Users can reserve tickets instantly and pay securely through Stripe
 - Organizers manage everything from one place
 - Each ticket has a unique QR code for validation
-- Availability is tracked in real-time
+- Availability is tracked in real-time, with automatic release of unpaid holds
 - The entire flow becomes structured and reliable
-
----
-
-## 🚀 Why This Platform Is Different
-
-This is not just a basic ticket app.  
-It is built as a **custom business system**, focused on real-world usage.
-
-### ⚙️ System-Oriented, Not Just UI
-Most apps focus only on design.  
-This platform focuses on **workflow clarity and operational structure**.
-
-### 🔒 Reliable Ticket Validation
-Each ticket includes:
-- Unique code
-- QR validation system
-- PDF generation
-
-This eliminates fake or duplicated tickets.
-
-### 📊 Organizer Control
-- Full event management
-- Ticket inventory control
-- Customization (branding, messages, visuals)
-
-### 🧠 Built for Scalability
-The architecture allows:
-- Easy extension (payments, analytics, dashboards)
-- Clean separation of logic
-- Future growth without rewriting core features
 
 ---
 
 ## ✨ Core Features
 
-- 🎟️ Multi-ticket system per event  
-- 📅 Event creation and customization  
-- 📄 Automatic PDF ticket generation  
-- 🔐 Role-based user system  
-- 📊 Real-time ticket availability  
-- 🎨 Event branding (banner + theme color)  
+- 🎟️ Multi-ticket system per event, with real-time stock tracking
+- 📅 Event creation, editing, and branding (banner + theme color)
+- 💳 Stripe Checkout — payment intents, webhooks, and server-side confirmation
+- 📄 Automatic PDF ticket generation with QR codes
+- 🔐 Role-based accounts (participant / organizer), password reset, login rate limiting
+- ⏳ Automatic release of ticket stock held by unpaid reservations
+- 💬 Contact/support form with reCAPTCHA and per-visitor conversation threads
+- 📊 Organizer dashboard with occupancy and revenue stats
 
 ---
 
 ## 🧱 Tech Stack
 
-- Django (Backend)
-- HTML / CSS (Custom UI system)
-- ReportLab (PDF generation)
-- qrcode (QR validation)
-- SQLite / PostgreSQL
+- **Backend:** Django 6, PostgreSQL (production) / SQLite (local)
+- **Payments:** Stripe (Payment Intents + webhooks)
+- **PDF / QR:** ReportLab, qrcode
+- **Spam protection:** django-recaptcha
+- **Static files:** WhiteNoise
+- **Hosting:** Render
+
+---
+
+## 🚀 Running it locally
+
+```bash
+git clone https://github.com/SanduAndreea22/platform_tickets.git
+cd platform_tickets/platform_tickets
+
+python -m venv env
+env\Scripts\activate        # or source env/bin/activate on macOS/Linux
+pip install -r requirements.txt
+
+# copy .env.example to .env and fill in SECRET_KEY / STRIPE_* keys
+python manage.py migrate
+python manage.py runserver
+```
+
+Want some sample events to look at instead of an empty homepage?
+
+```bash
+python manage.py seed_demo_data
+```
 
 ---
 
 ## 🎯 What This Project Represents
 
-This project is not just a demo.
+This project is not just a demo. It represents the ability to:
 
-It represents the ability to:
-- Build **production-ready systems**
-- Structure real business workflows
-- Design clean and scalable backend architecture
-- Deliver complete end-to-end solutions
+- Build production-ready systems with real payment processing
+- Structure real business workflows (inventory, reservations, role-based access)
+- Design clean, scalable backend architecture
+- Deliver a complete, deployed end-to-end solution — not just a local prototype
 
 ---
 
 ## 🔮 Future Development
 
-- Stripe payment integration  
-- Email ticket delivery  
-- Analytics dashboard  
-- Multi-language support  
+- Email ticket delivery
+- Analytics dashboard
+- Multi-language support
 
 ---
 
 ## 👩‍💻 Author
 
-**Andreea Sandu**  
+**Andreea Sandu**
 Custom Business Systems Developer | Django & Python
