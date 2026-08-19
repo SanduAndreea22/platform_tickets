@@ -39,7 +39,7 @@ TicketPlatform transforms this chaos into a clean, automated system:
 
 - Users can reserve tickets instantly and pay securely through Stripe
 - Organizers manage everything from one place
-- Each ticket has a unique QR code for validation
+- Each ticket has a unique QR code that's actually scanned and checked off at entry — not just generated and forgotten
 - Availability is tracked in real-time, with automatic release of unpaid holds
 - The entire flow becomes structured and reliable
 
@@ -47,14 +47,24 @@ TicketPlatform transforms this chaos into a clean, automated system:
 
 ## ✨ Core Features
 
-- 🎟️ Multi-ticket system per event, with real-time stock tracking
-- 📅 Event creation, editing, and branding (banner + theme color)
+**Booking & payments**
+- 🎟️ Multi-ticket system per event, with real-time stock tracking and a visual urgency indicator as tickets run low
 - 💳 Stripe Checkout — payment intents, webhooks, and server-side confirmation
-- 📄 Automatic PDF ticket generation with QR codes
-- 🔐 Role-based accounts (participant / organizer), password reset, login rate limiting
-- ⏳ Automatic release of ticket stock held by unpaid reservations
+- ⏳ Automatic release of ticket stock held by unpaid reservations, with a live countdown on the hold
+
+**At the door**
+- 📄 Automatic PDF ticket generation with a QR code, plus an in-browser "Show my ticket" QR reveal — no download required
+- ✅ Organizer check-in flow: scan the QR (or type the code manually) to mark a ticket used, with reuse blocked automatically
+
+**For organizers**
+- 📅 Event creation, editing, and branding (banner + theme color)
+- 📊 Organizer dashboard with occupancy, revenue stats, and per-reservation check-in status
+- 🔐 Role-based accounts (participant / organizer), password reset, login rate limiting shared across all app workers
+
+**Trust & polish**
+- 🔥 Social proof ("N people attending") and a live countdown to the event on the event page
+- 🌗 Full dark mode, including the checkout and payment confirmation screens
 - 💬 Contact/support form with reCAPTCHA and per-visitor conversation threads
-- 📊 Organizer dashboard with occupancy and revenue stats
 
 ---
 
@@ -73,7 +83,7 @@ TicketPlatform transforms this chaos into a clean, automated system:
 
 ```bash
 git clone https://github.com/SanduAndreea22/platform_tickets.git
-cd platform_tickets/platform_tickets
+cd platform_tickets
 
 python -m venv env
 env\Scripts\activate        # or source env/bin/activate on macOS/Linux
@@ -97,7 +107,7 @@ python manage.py seed_demo_data
 This project is not just a demo. It represents the ability to:
 
 - Build production-ready systems with real payment processing
-- Structure real business workflows (inventory, reservations, role-based access)
+- Structure real business workflows (inventory, reservations, role-based access, entry validation)
 - Design clean, scalable backend architecture
 - Deliver a complete, deployed end-to-end solution — not just a local prototype
 
@@ -106,7 +116,7 @@ This project is not just a demo. It represents the ability to:
 ## 🔮 Future Development
 
 - Email ticket delivery
-- Analytics dashboard
+- Deeper analytics (trends over time, exportable reports — beyond the current per-event stats)
 - Multi-language support
 
 ---
