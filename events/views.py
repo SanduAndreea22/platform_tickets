@@ -1,6 +1,7 @@
 import io
 import logging
 from decimal import Decimal, InvalidOperation
+from urllib.parse import quote
 
 import qrcode
 import stripe
@@ -16,6 +17,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.views.decorators.csrf import csrf_exempt
@@ -52,11 +54,15 @@ def event_detail(request, pk):
     if request.method == "POST":
         if not request.user.is_authenticated:
             messages.error(request, "Please log in to continue.")
-            return redirect("users:login")
+            return redirect(f"{reverse('users:login')}?next={quote(request.path)}")
 
         if not getattr(request.user, "is_participant", False):
             messages.error(request, "Only participants can reserve tickets.")
             return redirect("events:events_list")
+
+        if event.is_past:
+            messages.error(request, "This event has already ended.")
+            return redirect("events:event_detail", pk=pk)
 
         ticket_id = request.POST.get("ticket_id")
         try:
@@ -80,7 +86,7 @@ def event_detail(request, pk):
                     messages.error(request, "Not enough tickets available.")
                     return redirect("events:event_detail", pk=pk)
 
-                Reservation.objects.create(
+                reservation = Reservation.objects.create(
                     user=request.user,
                     ticket_type=ticket_type,
                     quantity=quantity,
@@ -92,8 +98,8 @@ def event_detail(request, pk):
             messages.error(request, "Not enough tickets available.")
             return redirect("events:event_detail", pk=pk)
 
-        messages.success(request, "Reservation created! Please complete your payment.")
-        return redirect("events:my_reservations")
+        messages.success(request, "Reservation created! Complete your payment to confirm it.")
+        return redirect("events:payment_page", reservation_id=reservation.id)
 
     return render(request, "events/event_detail.html", {"event": event})
 
@@ -260,6 +266,30 @@ def ticket_management(request, event_id):
         organizer=request.user
     )
 
+    if request.method == "POST":
+        action = request.POST.get("action")
+        res_id = request.POST.get("reservation_id")
+
+        with transaction.atomic():
+            reservation = Reservation.objects.select_for_update().filter(
+                id=res_id, ticket_type__event=event
+            ).first()
+
+            if reservation:
+                if action == "confirm":
+                    reservation.confirmed = True
+                    reservation.save()
+                    messages.success(request, "Reservation confirmed.")
+                elif action == "delete":
+                    ticket_type = TicketType.objects.select_for_update().get(
+                        id=reservation.ticket_type_id
+                    )
+                    ticket_type.release(reservation.quantity)
+                    reservation.delete()
+                    messages.success(request, "Reservation deleted.")
+
+        return redirect("events:ticket_management", event_id=event.id)
+
     # Fetch all reservations and user data in a single query
     reservations = Reservation.objects.filter(
         ticket_type__event=event
@@ -276,6 +306,49 @@ def ticket_management(request, event_id):
         # No need to calculate anything here,
         # as the template will directly call {{ event.total_revenue }}
     })
+
+
+@login_required
+def ticket_checkin(request, ticket_code):
+    # The QR code on every ticket PDF points here, so organizers can scan
+    # a ticket at the door (or type the code in manually) and mark it used.
+    # Locked to the event's organizer so one organizer can't check in
+    # tickets for someone else's event just by knowing/guessing a code.
+    reservation = get_object_or_404(
+        Reservation.objects.select_related("user", "ticket_type", "ticket_type__event"),
+        ticket_code=ticket_code,
+    )
+    event = reservation.ticket_type.event
+
+    if event.organizer_id != request.user.id:
+        messages.error(request, "You don't have permission to do that.")
+        return redirect("events:events_list")
+
+    if request.method == "POST":
+        with transaction.atomic():
+            reservation = Reservation.objects.select_for_update().get(id=reservation.id)
+
+            if not reservation.confirmed:
+                messages.error(request, "This ticket hasn't been paid for yet.")
+            elif reservation.is_used:
+                messages.error(
+                    request,
+                    f"This ticket was already checked in at "
+                    f"{timezone.localtime(reservation.used_at):%d %b %Y, %H:%M}.",
+                )
+            else:
+                reservation.is_used = True
+                reservation.used_at = timezone.now()
+                reservation.save()
+                messages.success(request, "Checked in — enjoy the event!")
+
+        return redirect("events:ticket_checkin", ticket_code=ticket_code)
+
+    return render(request, "events/ticket_checkin.html", {
+        "reservation": reservation,
+        "event": event,
+    })
+
 
 @login_required
 def customize_event(request, event_id):
@@ -502,9 +575,14 @@ def download_ticket_pdf(request, reservation_id):
     bg_rgb = (248 / 255, 250 / 255, 252 / 255)          # slate-50
     white_rgb = (1, 1, 1)
 
-    # Create QR
+    # Create QR — encodes the check-in URL (not just the bare code) so an
+    # organizer can scan it with a regular phone camera and land directly
+    # on the check-in page, no separate scanner app needed.
+    checkin_url = request.build_absolute_uri(
+        reverse("events:ticket_checkin", args=[reservation.ticket_code])
+    )
     qr = qrcode.QRCode(box_size=8, border=2)
-    qr.add_data(reservation.ticket_code)
+    qr.add_data(checkin_url)
     qr.make(fit=True)
     qr_img = qr.make_image(fill_color="#1e1b4b", back_color="white")
 

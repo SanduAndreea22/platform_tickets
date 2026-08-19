@@ -13,6 +13,24 @@
   color: var(--primary);
 }
 
+.checkin-lookup {
+  display: flex;
+  gap: 10px;
+  max-width: 480px;
+  margin: 0 auto 20px;
+}
+
+.checkin-lookup input {
+  flex: 1;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 10px 12px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+}
+
 /* Stats Grid */
 .stats-grid {
   display: grid;
@@ -45,7 +63,7 @@
 
 .stat-total { color: var(--success-dark); }
 .stat-occupancy { color: var(--primary); }
-.stat-available { color: #f59e0b; }
+.stat-available { color: var(--warning-dark); }
 
 /* Reservations Table */
 .reservations-wrapper {
@@ -112,12 +130,14 @@
   font-weight: 900;
   font-size: 12px;
   background: rgba(245,158,11,0.14);
-  color: #d97706;
+  color: var(--warning-dark);
   border: 1px solid rgba(245,158,11,0.25);
 }
 
 /* Buttons — sizing/shape comes from the shared .btn in base.css;
    these only add the color variants specific to this page. */
+.ticket-code-pending { color: var(--muted); }
+
 .btn-confirm { background: var(--success); color: #fff; }
 .btn-delete { background: var(--danger); color: #fff; }
 .btn-back {

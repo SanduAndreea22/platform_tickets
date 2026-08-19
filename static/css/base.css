@@ -222,7 +222,7 @@ a { color: inherit; }
 /* Mobile */
 .mobile-only { display: none; }
 
-@media (max-width: 860px) {
+@media (max-width: 1300px) {
   .mobile-only { display: flex; }
 
   .navbar {
@@ -253,6 +253,19 @@ html[data-theme="dark"] { --success: #34d399; --success-dark: #22c55e; }
 html[data-theme="dark"] { --danger: #f87171; --danger-dark: #ef4444; --warning: #fbbf24; --warning-dark: #f59e0b; }
 
 html { scroll-behavior: smooth; }
+
+/* Smooth light/dark toggle instead of an instant flash */
+body,
+body * {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body,
+  body * {
+    transition: none;
+  }
+}
 
 /* =====================================================
    Shared buttons (single source of truth — do not

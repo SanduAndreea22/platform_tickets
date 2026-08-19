@@ -12,6 +12,8 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.utils.http import url_has_allowed_host_and_scheme
 
+from .forms import CaptchaForm
+
 User = get_user_model()
 logger = logging.getLogger(__name__)
 
@@ -51,6 +53,7 @@ def register(request):
         username = (request.POST.get("username") or "").strip()
         email = (request.POST.get("email") or "").strip().lower()
         password = request.POST.get("password") or ""
+        password_confirm = request.POST.get("password_confirm") or ""
         role = request.POST.get("role")
 
         # Improved manual validations
@@ -68,6 +71,15 @@ def register(request):
 
         if User.objects.filter(email=email).exists():
             messages.error(request, "This email is already in use.")
+            return _redirect_with_next("users:register", next_url)
+
+        if password != password_confirm:
+            messages.error(request, "Passwords don't match.")
+            return _redirect_with_next("users:register", next_url)
+
+        captcha_form = CaptchaForm(request.POST)
+        if not captcha_form.is_valid():
+            messages.error(request, "Please confirm you're not a robot.")
             return _redirect_with_next("users:register", next_url)
 
         try:
@@ -97,7 +109,7 @@ def register(request):
         messages.success(request, "Account created successfully! You can now log in.")
         return _redirect_with_next("users:login", next_url)
 
-    return render(request, "users/register.html", {"next": next_url})
+    return render(request, "users/register.html", {"next": next_url, "captcha_form": CaptchaForm()})
 
 
 # ============================

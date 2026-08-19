@@ -121,6 +121,20 @@ else:
     }
 
 # =====================================================
+# CACHE
+# =====================================================
+# Database-backed so rate-limit counters (login attempts, etc.) are shared
+# across all gunicorn worker processes instead of each keeping its own
+# in-memory copy. The table is created by users.migrations.0004_cache_table.
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "django_cache_table",
+    }
+}
+
+# =====================================================
 # AUTH VALIDATORS
 # =====================================================
 

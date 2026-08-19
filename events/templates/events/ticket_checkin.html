@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Ticket check-in - TicketPlatform{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/ticket_management.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="section-header">
+  <h1 class="section-title">🎟️ Ticket check-in</h1>
+  <p class="section-subtitle">{{ event.title }}</p>
+</section>
+
+<div class="about-card" style="max-width:480px; margin:0 auto;">
+
+  <p><strong>Attendee:</strong> {{ reservation.user.get_full_name|default:reservation.user.username }}</p>
+  <p><strong>Ticket type:</strong> {{ reservation.ticket_type.name }}</p>
+  <p><strong>Quantity:</strong> {{ reservation.quantity }}</p>
+  <p><strong>Ticket code:</strong> <span class="ticket-code">{{ reservation.ticket_code }}</span></p>
+
+  <p style="margin-top:14px;">
+    {% if not reservation.confirmed %}
+      <span class="status-pending">Not paid yet</span>
+    {% elif reservation.is_used %}
+      <span class="status-pending">Already checked in at {{ reservation.used_at|date:"d M Y, H:i" }}</span>
+    {% else %}
+      <span class="status-confirmed">Valid — not checked in yet</span>
+    {% endif %}
+  </p>
+
+  {% if reservation.confirmed and not reservation.is_used %}
+    <form method="post" style="margin-top:18px;">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-primary">Confirm entry</button>
+    </form>
+  {% elif not reservation.confirmed %}
+    <p class="section-subtitle" style="margin-top:14px;">
+      This ticket can't be checked in until the reservation is paid.
+    </p>
+  {% endif %}
+
+  <div style="margin-top:18px;">
+    <a href="{% url 'events:ticket_management' event.id %}" class="btn btn-back">🔙 Back to ticket management</a>
+  </div>
+
+</div>
+
+{% endblock %}

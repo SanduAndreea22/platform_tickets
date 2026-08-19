@@ -45,7 +45,7 @@ if (menuToggle && navbar) {
   });
 
   window.addEventListener("resize", () => {
-    if (!window.matchMedia("(max-width: 860px)").matches) {
+    if (!window.matchMedia("(max-width: 1300px)").matches) {
       navbar.classList.remove("is-open");
       const icon = menuToggle.querySelector("i");
       if (icon) {

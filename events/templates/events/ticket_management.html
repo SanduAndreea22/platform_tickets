@@ -28,6 +28,12 @@
     </div>
   </div>
 
+  <!-- Ticket check-in lookup -->
+  <form id="checkin-lookup" class="checkin-lookup">
+    <input type="text" id="checkin-code" placeholder="Scan or type a ticket code (ET-XXXXXXXXXX)">
+    <button type="submit" class="btn btn-back">🔎 Check in a ticket</button>
+  </form>
+
   {% if reservations %}
   <!-- Reservations Table -->
   <div class="reservations-wrapper">
@@ -39,6 +45,7 @@
           <th>Quantity</th>
           <th>Ticket Code</th>
           <th>Status</th>
+          <th>Check-in</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -52,7 +59,7 @@
             {% if r.confirmed %}
               {{ r.ticket_code }}
             {% else %}
-              <span style="color:#9ca3af;">N/A</span>
+              <span class="ticket-code-pending">Not yet available</span>
             {% endif %}
           </td>
           <td>
@@ -60,6 +67,15 @@
               <span class="status-confirmed">Confirmed</span>
             {% else %}
               <span class="status-pending">Pending</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if not r.confirmed %}
+              <span class="ticket-code-pending">—</span>
+            {% elif r.is_used %}
+              <span class="status-confirmed">✅ {{ r.used_at|date:"d M, H:i" }}</span>
+            {% else %}
+              <a href="{% url 'events:ticket_checkin' r.ticket_code %}" class="status-pending" style="text-decoration:none;">Not checked in</a>
             {% endif %}
           </td>
           <td style="text-align:center;">
@@ -94,4 +110,16 @@
 
 </section>
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById("checkin-lookup").addEventListener("submit", function (e) {
+  e.preventDefault();
+  const code = document.getElementById("checkin-code").value.trim();
+  if (!code) return;
+  const url = "{% url 'events:ticket_checkin' 'PLACEHOLDER' %}".replace("PLACEHOLDER", encodeURIComponent(code));
+  window.location.href = url;
+});
+</script>
 {% endblock %}

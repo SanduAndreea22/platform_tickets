@@ -141,23 +141,6 @@
   margin-top:10px;
 }
 
-/* Messages */
-.message-list{
-  margin-top:16px;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
-
-.message-card{
-  padding:10px 12px;
-  border-radius:10px;
-  background:rgba(239,68,68,0.08);
-  border:1px solid rgba(239,68,68,0.18);
-  color:#b91c1c;
-  font-size:13px;
-}
-
 /* Footer */
 .auth-footer{
   margin-top:18px;

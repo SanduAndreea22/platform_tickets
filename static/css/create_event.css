@@ -39,15 +39,29 @@
 .create-event-form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
 }
 
+/* Each label sits close to its own field (small margin-bottom) and
+   gets its breathing room from the field group above it instead
+   (margin-top), so labels read as attached to the right input. */
 .create-event-form label {
   display: block;
+  margin-top: 14px;
   margin-bottom: 6px;
   font-size: 13px;
   font-weight: 700;
   color: var(--text);
+}
+
+.create-event-form > label:first-child {
+  margin-top: 0;
+}
+
+.create-event-form .form-grid,
+.create-event-form .ticket-header,
+.create-event-form #ticket-container,
+.create-event-form .create-event-btn {
+  margin-top: 14px;
 }
 
 .create-event-form input[type="text"],

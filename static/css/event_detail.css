@@ -189,6 +189,43 @@
   color: var(--text);
 }
 
+.stock-text-urgent {
+  color: var(--danger);
+}
+
+.stock-text-low {
+  color: var(--warning);
+}
+
+/* STOCK URGENCY BAR */
+.stock-bar {
+  margin-top: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(127,127,127,0.18);
+  overflow: hidden;
+}
+
+.stock-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--success);
+  transition: width 0.3s ease;
+}
+
+.stock-bar.is-low .stock-bar-fill {
+  background: var(--warning);
+}
+
+.stock-bar.is-urgent .stock-bar-fill {
+  background: var(--danger);
+}
+
+.stock-bar.is-soldout .stock-bar-fill {
+  background: var(--danger);
+  width: 100% !important;
+}
+
 /* FORM */
 .ticket-form {
   margin-top: 12px;

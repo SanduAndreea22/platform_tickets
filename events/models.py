@@ -236,6 +236,13 @@ class Reservation(models.Model):
         null=True,
     )
 
+    is_used = models.BooleanField(
+        default=False,
+        help_text="Whether this ticket has already been scanned/checked in at the event entrance.",
+    )
+
+    used_at = models.DateTimeField(null=True, blank=True)
+
     class Meta:
         verbose_name = "Reservation"
         verbose_name_plural = "Reservations"

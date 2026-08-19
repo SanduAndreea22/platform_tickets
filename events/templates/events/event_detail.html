@@ -75,12 +75,23 @@
           <b>{{ ticket.price }} {{ CURRENCY }}</b>
         </div>
 
+        {% widthratio ticket.available_quantity ticket.total_quantity 100 as pct_left %}
         <div class="ticket-row">
           <span>Availability</span>
-          <b>{{ ticket.available_quantity }} left</b>
+          <b class="{% if ticket.available_quantity == 0 %}stock-text-urgent{% elif pct_left <= 20 %}stock-text-urgent{% elif pct_left <= 50 %}stock-text-low{% endif %}">
+            {% if ticket.available_quantity == 0 %}Sold out{% else %}{{ ticket.available_quantity }} left{% endif %}
+          </b>
         </div>
 
-        {% if user.is_authenticated and user.is_participant %}
+        <div class="stock-bar{% if ticket.available_quantity == 0 %} is-soldout{% elif pct_left <= 20 %} is-urgent{% elif pct_left <= 50 %} is-low{% endif %}">
+          <div class="stock-bar-fill" style="width: {{ pct_left }}%;"></div>
+        </div>
+
+        {% if event.is_past %}
+        <p class="ticket-login">
+          This event has already ended.
+        </p>
+        {% elif user.is_authenticated and user.is_participant %}
         <form method="post" class="ticket-form">
           {% csrf_token %}
           <input type="hidden" name="ticket_id" value="{{ ticket.id }}">

@@ -48,6 +48,12 @@
         </span>
       </div>
 
+      <label>Confirm password</label>
+      <div class="input-group">
+        <i class="fa-solid fa-lock"></i>
+        <input type="password" name="password_confirm" autocomplete="new-password" required>
+      </div>
+
       <label class="main-label">User role</label>
 <div class="role-group-classic">
 
@@ -65,21 +71,13 @@
 
 
 
+      {{ captcha_form.captcha }}
+
       <button type="submit" class="btn btn-primary">
         Create account
       </button>
 
     </form>
-
-    {% if messages %}
-      <div class="message-list">
-        {% for message in messages %}
-          <div class="message-card">
-            {{ message }}
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
 
     <p class="auth-footer">
       Already have an account?

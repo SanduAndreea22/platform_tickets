@@ -86,7 +86,7 @@
 
 .badge-warning {
   background: rgba(245,158,11,.14);
-  color: #d97706;
+  color: var(--warning-dark);
   border: 1px solid rgba(245,158,11,.25);
 }
 
@@ -229,7 +229,7 @@
   border: none;
   cursor: pointer;
   color: #fff;
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  background: linear-gradient(135deg, var(--danger), var(--danger-dark));
   transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
 }
 
