@@ -553,6 +553,35 @@ def stripe_webhook(request):
     return HttpResponse(status=200)
 
 
+def _build_checkin_qr_image(request, reservation, box_size=8):
+    # Encodes the check-in URL (not just the bare code) so an organizer can
+    # scan it with a regular phone camera and land directly on the
+    # check-in page, no separate scanner app needed.
+    checkin_url = request.build_absolute_uri(
+        reverse("events:ticket_checkin", args=[reservation.ticket_code])
+    )
+    qr = qrcode.QRCode(box_size=box_size, border=2)
+    qr.add_data(checkin_url)
+    qr.make(fit=True)
+    return qr.make_image(fill_color="#1e1b4b", back_color="white")
+
+
+@login_required
+def ticket_qr_image(request, reservation_id):
+    reservation = get_object_or_404(
+        Reservation,
+        id=reservation_id,
+        user=request.user,
+        confirmed=True
+    )
+
+    qr_img = _build_checkin_qr_image(request, reservation, box_size=10)
+
+    buffer = io.BytesIO()
+    qr_img.save(buffer, format="PNG")
+    return HttpResponse(buffer.getvalue(), content_type="image/png")
+
+
 @login_required
 def download_ticket_pdf(request, reservation_id):
     reservation = get_object_or_404(
@@ -575,16 +604,7 @@ def download_ticket_pdf(request, reservation_id):
     bg_rgb = (248 / 255, 250 / 255, 252 / 255)          # slate-50
     white_rgb = (1, 1, 1)
 
-    # Create QR — encodes the check-in URL (not just the bare code) so an
-    # organizer can scan it with a regular phone camera and land directly
-    # on the check-in page, no separate scanner app needed.
-    checkin_url = request.build_absolute_uri(
-        reverse("events:ticket_checkin", args=[reservation.ticket_code])
-    )
-    qr = qrcode.QRCode(box_size=8, border=2)
-    qr.add_data(checkin_url)
-    qr.make(fit=True)
-    qr_img = qr.make_image(fill_color="#1e1b4b", back_color="white")
+    qr_img = _build_checkin_qr_image(request, reservation)
 
     # PDF
     buffer = io.BytesIO()

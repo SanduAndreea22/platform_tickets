@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const data = await response.json();
 
     if (!data.clientSecret) {
-      showError("We couldn't load the payment form. Please refresh the page or try again in a moment.");
+      showError("We couldn't set up your payment right now. Please refresh the page or try again in a moment — if it keeps happening, contact us and we'll help you complete your booking.");
       return;
     }
 

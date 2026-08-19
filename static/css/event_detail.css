@@ -114,6 +114,26 @@
   font-size: 13px;
 }
 
+.event-live-box {
+  border-color: rgba(239,68,68,.35);
+}
+
+.event-live-box i {
+  color: var(--danger);
+  animation: event-live-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes event-live-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .35; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .event-live-box i {
+    animation: none;
+  }
+}
+
 /* TICKETS CARD */
 .tickets-card {
   border: 1px solid var(--border);

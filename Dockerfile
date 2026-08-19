@@ -12,8 +12,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copiem codul sursă
 COPY . .
 
-# Colectăm fișierele statice pentru design
-RUN python manage.py collectstatic --noinput
+# Colectăm fișierele statice pentru design.
+# SECRET_KEY e doar pentru acest pas de build (collectstatic nu îl
+# folosește efectiv) — nu e salvată în imagine, deci verificarea reală
+# din settings.py tot cere SECRET_KEY la runtime dacă lipsește pe Render.
+RUN SECRET_KEY=build-time-placeholder-not-used-at-runtime python manage.py collectstatic --noinput
 
 EXPOSE 8000
 

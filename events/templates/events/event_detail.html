@@ -54,6 +54,30 @@
           <i class="fa-solid fa-flag-checkered"></i>
           <span><b>Ends:</b> {{ event.end_date|date:"d M Y H:i" }}</span>
         </div>
+
+        {% if event.is_past %}
+        <div class="event-info-box">
+          <i class="fa-solid fa-circle-check"></i>
+          <span><b>This event has ended.</b></span>
+        </div>
+        {% elif event.is_active %}
+        <div class="event-info-box event-live-box">
+          <i class="fa-solid fa-circle"></i>
+          <span><b>Happening now</b></span>
+        </div>
+        {% else %}
+        <div class="event-info-box event-countdown" data-start="{{ event.start_date|date:'c' }}">
+          <i class="fa-solid fa-hourglass-half"></i>
+          <span><b>Starts in:</b> <span class="event-countdown-value">calculating…</span></span>
+        </div>
+        {% endif %}
+
+        {% if event.confirmed_attendees > 0 %}
+        <div class="event-info-box">
+          <i class="fa-solid fa-users"></i>
+          <span><b>{{ event.confirmed_attendees }}</b> {{ event.confirmed_attendees|pluralize:"person is,people are" }} attending</span>
+        </div>
+        {% endif %}
       </div>
     </div>
   </div>
@@ -129,4 +153,40 @@
 
 </section>
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const box = document.querySelector(".event-countdown");
+  if (!box) return;
+
+  const target = new Date(box.dataset.start).getTime();
+  const valueEl = box.querySelector(".event-countdown-value");
+  let timer;
+
+  function tick() {
+    const remaining = target - Date.now();
+    if (remaining <= 0) {
+      valueEl.textContent = "starting now";
+      clearInterval(timer);
+      return;
+    }
+    const days = Math.floor(remaining / 86400000);
+    const hours = Math.floor((remaining % 86400000) / 3600000);
+    const minutes = Math.floor((remaining % 3600000) / 60000);
+
+    if (days > 0) {
+      valueEl.textContent = `${days}d ${hours}h`;
+    } else if (hours > 0) {
+      valueEl.textContent = `${hours}h ${minutes}m`;
+    } else {
+      valueEl.textContent = `${minutes}m`;
+    }
+  }
+
+  tick();
+  timer = setInterval(tick, 60000);
+});
+</script>
 {% endblock %}

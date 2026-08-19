@@ -9,6 +9,7 @@ urlpatterns = [
     path('my-tickets/', views.my_tickets, name='my_tickets'),
     path('my-reservations/', views.my_reservations, name='my_reservations'),
     path('ticket/<int:reservation_id>/download/', views.download_ticket_pdf, name='download_ticket_pdf'),
+    path('ticket/<int:reservation_id>/qr/', views.ticket_qr_image, name='ticket_qr_image'),
 
     path('create/', views.create_event, name='create_event'),
     path('edit/<int:event_id>/', views.edit_event, name='edit_event'),

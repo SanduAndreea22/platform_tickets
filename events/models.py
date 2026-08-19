@@ -105,6 +105,12 @@ class Event(models.Model):
         return min(prices) if prices else None
 
     @property
+    def confirmed_attendees(self):
+        return Reservation.objects.filter(
+            ticket_type__event=self, confirmed=True
+        ).aggregate(total=Sum("quantity"))["total"] or 0
+
+    @property
     def tickets_sold(self):
         return self.ticket_types.aggregate(
             sold=Sum(models.F("total_quantity") - models.F("available_quantity"))

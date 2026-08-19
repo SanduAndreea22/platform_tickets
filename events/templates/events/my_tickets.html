@@ -78,6 +78,19 @@
                 </div>
               </div>
 
+              <details class="ticket-qr-reveal">
+                <summary>🎫 Show my ticket</summary>
+                <div class="ticket-qr-panel">
+                  <img
+                    src="{% url 'events:ticket_qr_image' ticket.id %}"
+                    alt="QR code to check in at {{ ticket.ticket_type.event.title }}"
+                    class="ticket-qr-image"
+                    loading="lazy"
+                  >
+                  <p class="ticket-qr-hint">Show this at the entrance to check in.</p>
+                </div>
+              </details>
+
               <div class="ticket-actions">
                 <a
                   href="{% url 'events:download_ticket_pdf' ticket.id %}"

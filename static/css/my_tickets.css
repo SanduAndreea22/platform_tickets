@@ -144,6 +144,44 @@
   font-weight: 900;
 }
 
+/* QR reveal */
+.ticket-qr-reveal {
+  margin-top: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 10px 12px;
+}
+
+.ticket-qr-reveal summary {
+  cursor: pointer;
+  font-weight: 800;
+  color: var(--text);
+  list-style: none;
+}
+
+.ticket-qr-reveal summary::-webkit-details-marker {
+  display: none;
+}
+
+.ticket-qr-panel {
+  margin-top: 14px;
+  text-align: center;
+}
+
+.ticket-qr-image {
+  width: 160px;
+  height: 160px;
+  border-radius: 12px;
+  background: #fff;
+  padding: 8px;
+}
+
+.ticket-qr-hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
 /* actions */
 .ticket-actions {
   margin-top: 14px;
