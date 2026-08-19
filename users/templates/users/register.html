@@ -23,6 +23,7 @@
 
     <form method="POST" class="auth-form">
       {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
 
       <label>Username</label>
       <div class="input-group">
@@ -64,7 +65,7 @@
 
 
 
-      <button type="submit" class="btn-primary">
+      <button type="submit" class="btn btn-primary">
         Create account
       </button>
 

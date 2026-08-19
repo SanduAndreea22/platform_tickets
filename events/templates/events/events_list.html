@@ -52,7 +52,9 @@
         {% if event.image %}
           <img src="{{ event.image.url }}" alt="{{ event.title }}">
         {% else %}
-          <img src="https://via.placeholder.com/400x200?text=No+Image" alt="No image">
+          <div class="image-fallback" style="--fallback-color: {{ event.theme_color }};">
+            <i class="fa-solid fa-ticket"></i>
+          </div>
         {% endif %}
 
         <div class="event-body">
@@ -68,6 +70,14 @@
             <span>
               <i class="fa-solid fa-calendar"></i>
               {{ event.start_date|date:"d M Y H:i" }}
+            </span>
+            <span>
+              <i class="fa-solid fa-tag"></i>
+              {% if event.starting_price is not None %}
+                From {{ event.starting_price }} {{ CURRENCY }}
+              {% else %}
+                Price TBA
+              {% endif %}
             </span>
           </div>
 

@@ -32,11 +32,12 @@
               class="ticket-image"
             >
           {% else %}
-            <img
-              src="https://via.placeholder.com/400x200?text=No+Image"
-              alt="No image"
-              class="ticket-image"
+            <div
+              class="ticket-image image-fallback"
+              style="--fallback-color: {{ ticket.ticket_type.event.theme_color }};"
             >
+              <i class="fa-solid fa-ticket"></i>
+            </div>
           {% endif %}
 
           <div class="ticket-content">
@@ -120,8 +121,5 @@
   {% endif %}
 
 </section>
-
-<!-- Font Awesome -->
-<script src="https://kit.fontawesome.com/4b4e94b96e.js" crossorigin="anonymous"></script>
 
 {% endblock %}

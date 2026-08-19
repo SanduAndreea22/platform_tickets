@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Something went wrong - TicketPlatform{% endblock %}
+
+{% block content %}
+<section class="error-page">
+  <div class="error-card">
+    <p class="error-code">500</p>
+    <h1>Something went wrong on our end</h1>
+    <p>Sorry about that. Please try again in a moment — if you were in the middle of a payment and were charged, contact us and we'll sort it out.</p>
+    <a class="btn btn-primary" href="{% url 'pages:home' %}">Back to TicketPlatform</a>
+  </div>
+</section>
+{% endblock %}

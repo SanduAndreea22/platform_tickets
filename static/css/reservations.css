@@ -142,6 +142,36 @@
   color: var(--text);
 }
 
+/* expiry / countdown */
+.reservation-expiry {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: rgba(245,158,11,0.08);
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.reservation-countdown {
+  font-weight: 800;
+  color: var(--warning);
+}
+
+.reservation-expiry.is-urgent {
+  border-color: rgba(239,68,68,0.4);
+  background: rgba(239,68,68,0.1);
+}
+
+.reservation-expiry.is-urgent .reservation-countdown {
+  color: var(--danger);
+}
+
+.reservation-expiry.is-expired .reservation-countdown {
+  color: var(--danger);
+}
+
 /* actions */
 .reservation-actions {
   margin-top: 14px;

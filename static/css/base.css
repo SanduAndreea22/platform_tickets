@@ -249,6 +249,9 @@ a { color: inherit; }
 :root { --success: #22c55e; --success-dark: #16a34a; }
 html[data-theme="dark"] { --success: #34d399; --success-dark: #22c55e; }
 
+:root { --danger: #ef4444; --danger-dark: #dc2626; --warning: #f59e0b; --warning-dark: #d97706; }
+html[data-theme="dark"] { --danger: #f87171; --danger-dark: #ef4444; --warning: #fbbf24; --warning-dark: #f59e0b; }
+
 html { scroll-behavior: smooth; }
 
 /* =====================================================
@@ -343,10 +346,96 @@ html { scroll-behavior: smooth; }
     var(--surface);
 }
 
+.cta-title {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--text);
+}
+
+.cta-text {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+
 .cta-actions {
   display: flex;
   justify-content: center;
   gap: 10px;
   margin-top: 12px;
   flex-wrap: wrap;
+}
+
+/* =====================================================
+   Form field errors (single source of truth — every
+   form across the site uses this class)
+   ===================================================== */
+
+.field-error {
+  margin: 6px 0 0;
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* =====================================================
+   Event image fallback (used instead of a broken
+   external placeholder when an event has no photo)
+   ===================================================== */
+
+.image-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--fallback-color, var(--primary));
+  background-image: linear-gradient(135deg, rgba(255,255,255,.2), rgba(0,0,0,.15));
+}
+
+.image-fallback i {
+  color: #fff;
+  font-size: 32px;
+  opacity: .9;
+}
+
+/* =====================================================
+   404 / 500 error pages
+   ===================================================== */
+
+.error-page {
+  display: flex;
+  justify-content: center;
+  padding: 60px 5% 80px;
+}
+
+.error-card {
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 40px 32px;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.06);
+}
+
+.error-code {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--primary);
+}
+
+.error-card h1 {
+  margin: 0 0 12px;
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--text);
+}
+
+.error-card p {
+  margin: 0 0 22px;
+  color: var(--muted);
+  line-height: 1.5;
 }

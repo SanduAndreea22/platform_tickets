@@ -143,13 +143,6 @@ html[data-theme="dark"] .chat {
   box-shadow: 0 0 0 4px rgba(99,102,241,.15);
 }
 
-.field-error {
-  margin: 6px 0 0;
-  color: #e11d48;
-  font-size: 13px;
-  font-weight: 700;
-}
-
 /* Send button */
 .send-btn {
   padding: 11px 18px;

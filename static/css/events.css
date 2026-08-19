@@ -138,7 +138,8 @@
 
 /* IMAGE */
 
-.event-card img{
+.event-card img,
+.event-card .image-fallback{
   width:100%;
   height:180px;
   object-fit:cover;

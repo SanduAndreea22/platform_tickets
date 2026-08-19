@@ -18,4 +18,4 @@ RUN python manage.py collectstatic --noinput
 EXPOSE 8000
 
 # Folosim Gunicorn pentru o viteză mai bună pe Render
-CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "ticket_platform.wsgi:application", "--bind", "0.0.0.0:8000"]

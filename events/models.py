@@ -100,6 +100,11 @@ class Event(models.Model):
         return sum(t.total_quantity for t in self.ticket_types.all())
 
     @property
+    def starting_price(self):
+        prices = [t.price for t in self.ticket_types.all()]
+        return min(prices) if prices else None
+
+    @property
     def tickets_sold(self):
         return self.ticket_types.aggregate(
             sold=Sum(models.F("total_quantity") - models.F("available_quantity"))

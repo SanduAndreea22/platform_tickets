@@ -23,6 +23,7 @@
 
     <form method="POST" class="auth-form">
       {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
 
       <label>Username</label>
       <div class="input-group">
@@ -41,7 +42,7 @@
         </span>
       </div>
 
-      <button type="submit" class="btn-primary">
+      <button type="submit" class="btn btn-primary">
         Log in
       </button>
 
@@ -53,7 +54,7 @@
 
     <p class="auth-footer">
       Don't have an account?
-      <a href="{% url 'users:register' %}">Create one</a>
+      <a href="{% url 'users:register' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Create one</a>
     </p>
 
   </div>

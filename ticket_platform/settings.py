@@ -10,8 +10,16 @@ load_dotenv()
 # SECURITY
 # =====================================================
 
-SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-local-only")
 DEBUG = os.getenv("DEBUG", "False") == "True"
+
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = "dev-secret-local-only"
+    else:
+        raise RuntimeError(
+            "SECRET_KEY environment variable must be set when DEBUG=False."
+        )
 
 ALLOWED_HOSTS = os.getenv(
     "ALLOWED_HOSTS",

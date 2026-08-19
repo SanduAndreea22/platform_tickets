@@ -31,7 +31,7 @@ class ContactForm(forms.ModelForm):
     def clean_honeypot(self):
         data = self.cleaned_data.get("honeypot")
         if data:
-            raise forms.ValidationError("Spam detected.")
+            raise forms.ValidationError("Your message looks like spam — please try again.")
         return data
 
     def clean_message(self):

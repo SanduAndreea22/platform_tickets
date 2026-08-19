@@ -17,7 +17,9 @@
       {% if event.image %}
         <img src="{{ event.image.url }}" alt="{{ event.title }}">
       {% else %}
-        <img src="https://via.placeholder.com/1200x400?text=No+Image">
+        <div class="image-fallback" style="--fallback-color: {{ event.theme_color }};">
+          <i class="fa-solid fa-ticket"></i>
+        </div>
       {% endif %}
 
       <div class="event-overlay">
@@ -95,9 +97,14 @@
             Reserve now
           </button>
         </form>
+        {% elif user.is_authenticated %}
+        <p class="ticket-login">
+          Only participant accounts can reserve tickets.
+        </p>
         {% else %}
         <p class="ticket-login">
-          Log in as a participant to reserve tickets.
+          <a href="{% url 'users:login' %}?next={{ request.path|urlencode }}">Log in</a>
+          as a participant to reserve tickets.
         </p>
         {% endif %}
       </div>

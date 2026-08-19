@@ -1,0 +1,142 @@
+/* =====================================================
+   Checkout (payment_page.html)
+   ===================================================== */
+
+.checkout-page {
+  min-height: 70vh;
+  padding: 60px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.checkout-header {
+  text-align: center;
+  color: var(--text);
+  margin-bottom: 28px;
+}
+
+.checkout-header h1 {
+  margin: 0 0 8px;
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.checkout-header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 16px;
+}
+
+.checkout-card {
+  width: 100%;
+  max-width: 480px;
+  padding: 26px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.12);
+  color: var(--text);
+}
+
+.checkout-summary p {
+  margin: 0 0 10px;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+}
+
+.checkout-summary p:last-child {
+  margin-bottom: 0;
+}
+
+.checkout-summary i {
+  color: var(--primary);
+  width: 16px;
+  text-align: center;
+}
+
+#payment-element {
+  margin-top: 18px;
+}
+
+.checkout-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+#payment-message {
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 13px;
+  display: none;
+}
+
+#payment-message.is-error {
+  display: block;
+  background: rgba(239,68,68,0.12);
+  color: var(--danger);
+  border: 1px solid rgba(239,68,68,0.3);
+}
+
+/* =====================================================
+   Payment result pages (success / cancel)
+   ===================================================== */
+
+.result-page {
+  max-width: 520px;
+  margin: 60px auto 0;
+  padding: 50px 30px;
+  text-align: center;
+  border-radius: 26px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.result-icon {
+  font-size: 56px;
+  margin-bottom: 18px;
+}
+
+.result-icon.is-success {
+  color: var(--success);
+  animation: result-bounce 1.2s infinite;
+}
+
+.result-icon.is-cancel {
+  color: var(--warning);
+}
+
+@keyframes result-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.result-page h1 {
+  margin: 0 0 14px;
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--text);
+}
+
+.result-page p {
+  margin: 0 0 26px;
+  font-size: 16px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}

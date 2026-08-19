@@ -29,7 +29,7 @@ def events_list(request):
     query = request.GET.get("q", "")
     date = request.GET.get("date", "")
 
-    events = Event.objects.all().order_by("start_date")
+    events = Event.objects.prefetch_related("ticket_types").order_by("start_date")
 
     if query:
         events = events.filter(
@@ -51,7 +51,7 @@ def event_detail(request, pk):
 
     if request.method == "POST":
         if not request.user.is_authenticated:
-            messages.error(request, "You must be authenticated.")
+            messages.error(request, "Please log in to continue.")
             return redirect("users:login")
 
         if not getattr(request.user, "is_participant", False):
@@ -65,7 +65,7 @@ def event_detail(request, pk):
             quantity = 1
 
         if quantity <= 0:
-            messages.error(request, "Invalid quantity.")
+            messages.error(request, "Please enter a valid number of tickets.")
             return redirect("events:event_detail", pk=pk)
 
         try:
@@ -124,15 +124,25 @@ def my_reservations(request):
 
     if request.method == "POST":
         res_id = request.POST.get("reservation_id")
-        reservation = Reservation.objects.filter(id=res_id, user=request.user).first()
 
-        if reservation:
-            if reservation.confirmed:
-                messages.error(request, "You cannot cancel a paid reservation.")
-            else:
-                reservation.ticket_type.release(reservation.quantity)
-                reservation.delete()
-                messages.success(request, "Reservation has been cancelled.")
+        with transaction.atomic():
+            # Lock the reservation row before checking/acting on `confirmed`,
+            # so a webhook confirming payment concurrently can't slip in
+            # between the check and the delete (see audit-cod).
+            reservation = Reservation.objects.select_for_update().filter(
+                id=res_id, user=request.user
+            ).first()
+
+            if reservation:
+                if reservation.confirmed:
+                    messages.error(request, "You cannot cancel a paid reservation.")
+                else:
+                    ticket_type = TicketType.objects.select_for_update().get(
+                        id=reservation.ticket_type_id
+                    )
+                    ticket_type.release(reservation.quantity)
+                    reservation.delete()
+                    messages.success(request, "Reservation has been cancelled.")
 
         return redirect("events:my_reservations")
 
@@ -142,7 +152,7 @@ def my_reservations(request):
 @login_required
 def create_event(request):
     if not request.user.is_organizer:
-        messages.error(request, "You do not have permission.")
+        messages.error(request, "You don't have permission to do that.")
         return redirect("pages:home")
 
     if request.method == "POST":
@@ -166,7 +176,7 @@ def create_event(request):
             return redirect("events:create_event")
 
         if end_date < start_date:
-            messages.error(request, "Invalid time period.")
+            messages.error(request, "The end date must be after the start date.")
             return redirect("events:create_event")
 
         event = Event.objects.create(
@@ -222,11 +232,11 @@ def edit_event(request, event_id):
         end_date = parse_datetime(request.POST.get("end_date"))
 
         if not start_date or not end_date:
-            messages.error(request, "Invalid dates.")
+            messages.error(request, "Please double-check your event dates.")
             return redirect("events:edit_event", event_id=event.id)
 
         if end_date < start_date:
-            messages.error(request, "Invalid dates.")
+            messages.error(request, "The end date must be after the start date.")
             return redirect("events:edit_event", event_id=event.id)
 
         event.start_date = start_date
@@ -361,7 +371,11 @@ def payment_success(request):
     payment_intent_id = request.GET.get("payment_intent")
 
     if not payment_intent_id:
-        messages.error(request, "Could not confirm payment.")
+        messages.error(
+            request,
+            "We couldn't confirm your payment. If you were charged, don't worry — "
+            "contact us and we'll sort it out.",
+        )
         return redirect("events:my_reservations")
 
     # Confirmarea se face DOAR pe baza statusului real din Stripe, nu pe
@@ -372,7 +386,11 @@ def payment_success(request):
         intent = stripe.PaymentIntent.retrieve(payment_intent_id)
     except stripe.error.StripeError:
         logger.warning("Stripe retrieve failed for intent %s (user %s)", payment_intent_id, request.user.id)
-        messages.error(request, "Could not confirm payment.")
+        messages.error(
+            request,
+            "We couldn't confirm your payment. If you were charged, don't worry — "
+            "contact us and we'll sort it out.",
+        )
         return redirect("events:my_reservations")
 
     if intent.status != "succeeded":
@@ -394,7 +412,11 @@ def payment_success(request):
         )
 
         if not payment:
-            messages.error(request, "Payment not found.")
+            messages.error(
+                request,
+                "We couldn't find that payment. Please go back to your "
+                "reservations and try again.",
+            )
             return redirect("events:my_reservations")
 
         if payment.status != Payment.STATUS_COMPLETED:

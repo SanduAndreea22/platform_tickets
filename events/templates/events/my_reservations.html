@@ -32,11 +32,12 @@
               class="reservation-image"
             >
           {% else %}
-            <img
-              src="https://via.placeholder.com/400x200?text=No+Image"
-              alt="No image"
-              class="reservation-image"
+            <div
+              class="reservation-image image-fallback"
+              style="--fallback-color: {{ r.ticket_type.event.theme_color }};"
             >
+              <i class="fa-solid fa-ticket"></i>
+            </div>
           {% endif %}
 
           <div class="reservation-content">
@@ -85,8 +86,10 @@
             </div>
 
             {% if not r.confirmed %}
-              <p class="reservation-expiry">
-                ⏳ Hold expires at {{ r.expires_at|date:"d M Y H:i" }} — pay before then or the tickets are released back to stock.
+              <p class="reservation-expiry" data-expires-at="{{ r.expires_at|date:'c' }}">
+                ⏳ Hold expires at {{ r.expires_at|date:"d M Y H:i" }}
+                (<span class="reservation-countdown">calculating…</span>)
+                — pay before then or the tickets are released back to stock.
               </p>
               <div class="reservation-actions">
 
@@ -133,8 +136,10 @@
 
 </section>
 
-<script src="https://kit.fontawesome.com/4b4e94b96e.js" crossorigin="anonymous"></script>
+{% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/reservation_countdown.js' %}"></script>
 {% endblock %}
 
 

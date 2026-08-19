@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Page not found - TicketPlatform{% endblock %}
+
+{% block content %}
+<section class="error-page">
+  <div class="error-card">
+    <p class="error-code">404</p>
+    <h1>We couldn't find that page</h1>
+    <p>The link might be broken, or the page may have moved. Let's get you back to browsing events.</p>
+    <a class="btn btn-primary" href="{% url 'events:events_list' %}">Browse events</a>
+  </div>
+</section>
+{% endblock %}

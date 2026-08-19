@@ -25,7 +25,8 @@
   background: #111827;
 }
 
-.event-cover img {
+.event-cover img,
+.event-cover .image-fallback {
   width: 100%;
   height: 320px;
   object-fit: cover;
