@@ -350,3 +350,8 @@ input[type=color] { width: 56px; height: 44px; padding: 3px; border: 1px solid v
 .site-header.on-hero .btn-quiet:hover { background: rgba(255,255,255,.1); }
 .site-header.on-hero .btn-primary { background: #fff; color: #1a0f45; }
 @media (max-width: 960px) { .site-header.on-hero .nav .nav-link { color: var(--text-2); } .site-header.on-hero .nav .nav-link:hover { background: var(--surface-2); color: var(--text); } }
+
+/* ---------- Pagination ---------- */
+.pager { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 36px 0 8px; flex-wrap: wrap; }
+.pager-info { font-size: 13.5px; color: var(--muted); }
+.pager-info b { color: var(--text); }

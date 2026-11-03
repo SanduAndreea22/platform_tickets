@@ -16,6 +16,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -27,6 +28,16 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Event, TicketType, Reservation, Payment
 
 logger = logging.getLogger(__name__)
+
+
+def _paginate(request, queryset, per_page):
+    """Return (page_obj, extra_qs) so long lists render a page at a time.
+    extra_qs keeps the other GET filters (e.g. q, date) in the page links."""
+    page_obj = Paginator(queryset, per_page).get_page(request.GET.get("page"))
+    params = request.GET.copy()
+    params.pop("page", None)
+    extra = params.urlencode()
+    return page_obj, (f"&{extra}" if extra else "")
 
 
 def events_list(request):
@@ -43,8 +54,11 @@ def events_list(request):
     if date:
         events = events.filter(start_date__date=date)
 
+    page_obj, extra_qs = _paginate(request, events, 12)
     return render(request, "events/events_list.html", {
-        "events": events,
+        "events": page_obj,
+        "page_obj": page_obj,
+        "extra_qs": extra_qs,
         "query": query,
         "date": date,
     })
@@ -117,7 +131,10 @@ def my_tickets(request):
         confirmed=True
     ).select_related("ticket_type", "ticket_type__event")
 
-    return render(request, "events/my_tickets.html", {"tickets": tickets})
+    page_obj, extra_qs = _paginate(request, tickets, 6)
+    return render(request, "events/my_tickets.html", {
+        "tickets": page_obj, "page_obj": page_obj, "extra_qs": extra_qs,
+    })
 
 
 @login_required
@@ -154,7 +171,10 @@ def my_reservations(request):
 
         return redirect("events:my_reservations")
 
-    return render(request, "events/my_reservations.html", {"reservations": reservations})
+    page_obj, extra_qs = _paginate(request, reservations, 8)
+    return render(request, "events/my_reservations.html", {
+        "reservations": page_obj, "page_obj": page_obj, "extra_qs": extra_qs,
+    })
 
 
 @login_required
@@ -302,9 +322,12 @@ def ticket_management(request, event_id):
     # event.tickets_sold -> comes from model aggregate
     # event.total_capacity -> comes from the sum of total_quantity
 
+    page_obj, extra_qs = _paginate(request, reservations, 15)
     return render(request, "events/ticket_management.html", {
         "event": event,
-        "reservations": reservations,
+        "reservations": page_obj,
+        "page_obj": page_obj,
+        "extra_qs": extra_qs,
         # No need to calculate anything here,
         # as the template will directly call {{ event.total_revenue }}
     })

@@ -429,3 +429,30 @@ class OrganizerDashboardTests(TestCase):
         self.assertNotContains(resp, 'value="None"')
         resp = self.client.post(reverse("users:login"), {"username": "part1", "password": "pw", "next": ""})
         self.assertRedirects(resp, reverse("users:profile"), fetch_redirect_response=False)
+
+
+class PaginationTests(TestCase):
+    def setUp(self):
+        User = get_user_model()
+        org = User.objects.create_user("porg", password="pw", is_organizer=True, is_participant=False)
+        self.part = User.objects.create_user("ppart", password="pw")
+        now = timezone.now()
+        for i in range(14):
+            ev = Event.objects.create(organizer=org, title=f"Ev {i}", description="d", location="X",
+                                      start_date=now + timedelta(days=i + 1), end_date=now + timedelta(days=i + 2))
+            tt = TicketType.objects.create(event=ev, name="GA", price="10", total_quantity=5, available_quantity=4)
+            Reservation.objects.create(user=self.part, ticket_type=tt, quantity=1, confirmed=True)
+
+    def test_events_list_is_paginated_and_keeps_filters(self):
+        r = self.client.get(reverse("events:events_list"), {"q": "Ev"})
+        self.assertEqual(len(r.context["events"]), 12)
+        self.assertContains(r, "page=2&amp;q=Ev")
+        r2 = self.client.get(reverse("events:events_list"), {"q": "Ev", "page": 2})
+        self.assertEqual(len(r2.context["events"]), 2)
+
+    def test_my_tickets_is_paginated(self):
+        self.client.force_login(self.part)
+        r = self.client.get(reverse("events:my_tickets"))
+        self.assertEqual(len(r.context["tickets"]), 6)
+        self.assertEqual(r.context["page_obj"].paginator.count, 14)
+        self.assertEqual(self.client.get(reverse("events:my_tickets"), {"page": 99}).status_code, 200)

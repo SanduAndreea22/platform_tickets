@@ -32,7 +32,7 @@
 
 <section class="container">
   <div class="result-bar">
-    <h2>{% if query or date %}Results{% else %}All events{% endif %} <span class="muted" style="font-weight:500">· {{ events|length }}</span></h2>
+    <h2>{% if query or date %}Results{% else %}All events{% endif %} <span class="muted" style="font-weight:500">· {{ page_obj.paginator.count }}</span></h2>
     {% if query or date %}<a href="{% url 'events:events_list' %}" class="btn btn-ghost btn-sm"><i class="fa-solid fa-xmark"></i> Clear filters</a>{% endif %}
   </div>
 
@@ -42,6 +42,7 @@
       {% include "partials/event_card.html" %}
     {% endfor %}
   </div>
+  {% include "partials/pagination.html" %}
   {% else %}
   <div class="empty">
     <div class="ic"><i class="fa-solid fa-magnifying-glass"></i></div>

@@ -5,7 +5,7 @@
   <header class="page-head">
     <span class="eyebrow">Wallet</span>
     <h1 style="margin-top:10px">My tickets</h1>
-    <p>Show the QR code at the entrance, or download the PDF.</p>
+    <p>Show the QR code at the entrance, or download the PDF. ({{ page_obj.paginator.count }} total)</p>
   </header>
 
   {% if tickets %}
@@ -40,6 +40,7 @@
     {% endwith %}
     {% endfor %}
   </div>
+  {% include "partials/pagination.html" %}
   {% else %}
   <div class="empty">
     <div class="ic"><i class="fa-solid fa-ticket"></i></div>
