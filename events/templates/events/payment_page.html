@@ -2,46 +2,54 @@
 {% load static %}
 {% block title %}Checkout - TicketPlatform{% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/payment.css' %}">
-{% endblock %}
-
 {% block content %}
+<div class="container">
+<section class="checkout">
+  <div>
+    <div class="steps">
+      <span class="s done"><b><i class="fa-solid fa-check" style="font-size:10px"></i></b> Choose tickets</span><span class="sep"></span>
+      <span class="s now"><b>2</b> Payment</span><span class="sep"></span>
+      <span class="s"><b>3</b> Your tickets</span>
+    </div>
+    <h1>Complete your booking</h1>
+    <p class="muted">Your seats are held while you pay.</p>
 
-<section class="checkout-page">
+    <div class="card pay-card">
+      <h2>Payment details <span class="badge badge-success no-dot"><i class="fa-solid fa-lock" style="font-size:10px"></i> Secured by Stripe</span></h2>
+      <div id="payment-element"><div class="skeleton"></div></div>
 
-  <div class="checkout-header">
-    <h1>💳 Checkout</h1>
-    <p>Event: <strong>{{ reservation.ticket_type.event.title }}</strong></p>
+      <div class="pay-actions">
+        <button id="submit" type="button" class="btn btn-primary btn-lg btn-block">Pay {{ payment.amount }} {{ CURRENCY }}</button>
+        <a href="{% url 'events:payment_cancel' %}" class="btn btn-quiet btn-block">Cancel and go back</a>
+      </div>
+      <div id="payment-message"></div>
+      <div class="test-card"><i class="fa-solid fa-flask"></i> Test mode — use card <b>4242 4242 4242 4242</b>, any future date, any CVC.</div>
+    </div>
   </div>
 
-  <div class="checkout-card">
-
-    <div class="checkout-summary">
-      <p><i class="fa-solid fa-ticket"></i> Ticket type: <b>{{ reservation.ticket_type.name }}</b></p>
-      <p><i class="fa-solid fa-hashtag"></i> Quantity: <b>{{ reservation.quantity }}</b></p>
-      <p><i class="fa-solid fa-wallet"></i> Total: <b>{{ payment.amount }} {{ CURRENCY }}</b></p>
-    </div>
-
-    <div id="payment-element"></div>
-
-    <div class="checkout-actions">
-      <button id="submit" type="button" class="btn btn-primary">
-        Pay now
-      </button>
-
-      <a href="{% url 'events:payment_cancel' %}" class="btn btn-ghost">
-        Cancel and go back
-      </a>
-    </div>
-
-    <div id="payment-message"></div>
-  </div>
+  <aside class="card summary">
+    {% with event=reservation.ticket_type.event %}
+      {% if event.image %}<img class="cover" src="{{ event.image.url }}" alt="">{% else %}<div class="art" style="--c: {{ event.theme_color }}"><i class="fa-solid fa-ticket"></i></div>{% endif %}
+      <div class="summary-body">
+        <h3>{{ event.title }}</h3>
+        <div class="meta-line"><i class="fa-regular fa-calendar"></i>{{ event.start_date|date:"D, d M Y · H:i" }}</div>
+        <div class="meta-line" style="margin-top:4px"><i class="fa-solid fa-location-dot"></i>{{ event.location }}</div>
+        <div class="rows">
+          <div><span>Ticket type</span><b>{{ reservation.ticket_type.name }}</b></div>
+          <div><span>Quantity</span><b>{{ reservation.quantity }}</b></div>
+          <div><span>Price each</span><b>{{ reservation.ticket_type.price }} {{ CURRENCY }}</b></div>
+        </div>
+        <div class="total"><span class="muted">Total</span><b>{{ payment.amount }} {{ CURRENCY }}</b></div>
+        {% if not reservation.confirmed %}
+        <div class="hold-timer reservation-expiry" data-expires-at="{{ reservation.expires_at|date:'c' }}"><i class="fa-regular fa-clock"></i><span>Seats held · <span class="reservation-countdown">…</span></span></div>
+        {% endif %}
+      </div>
+    {% endwith %}
+  </aside>
 </section>
+</div>
 
-<!-- Stripe -->
 <script src="https://js.stripe.com/v3/"></script>
-
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   const stripe = Stripe("{{ STRIPE_PUBLIC_KEY }}");
@@ -60,11 +68,16 @@ document.addEventListener("DOMContentLoaded", function () {
     const data = await response.json();
 
     if (!data.clientSecret) {
+      document.querySelector("#payment-element .skeleton")?.remove();
       showError("We couldn't set up your payment right now. Please refresh the page or try again in a moment — if it keeps happening, contact us and we'll help you complete your booking.");
       return;
     }
 
-    const elements = stripe.elements({ clientSecret: data.clientSecret });
+    const dark = document.documentElement.getAttribute("data-theme") === "dark";
+    const elements = stripe.elements({
+      clientSecret: data.clientSecret,
+      appearance: { theme: dark ? "night" : "stripe", variables: { colorPrimary: "#7c3aed", borderRadius: "10px", fontFamily: "Inter, system-ui, sans-serif" } },
+    });
     const paymentElement = elements.create("payment");
     paymentElement.mount("#payment-element");
 
@@ -85,5 +98,5 @@ document.addEventListener("DOMContentLoaded", function () {
   initialize();
 });
 </script>
-
+<script src="{% static 'js/reservation_countdown.js' %}"></script>
 {% endblock %}

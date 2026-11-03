@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en" data-theme="light">
+<head>
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("theme");
+        if (!saved && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) saved = "dark";
+        if (saved === "dark" || saved === "light") document.documentElement.setAttribute("data-theme", saved);
+      } catch (e) {}
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Organizer - TicketPlatform{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="dash-body">
+  {% with cur=request.resolver_match.url_name %}
+  <div class="dash">
+    <aside class="sidebar" id="sidebar">
+      <a href="{% url 'pages:home' %}" class="brand"><span class="brand-mark"><i class="fa-solid fa-ticket"></i></span><span>TicketPlatform</span></a>
+      <span class="side-label">Organizer</span>
+      <nav class="side-nav">
+        <a href="{% url 'events:organizer_dashboard' %}" class="{% if cur == 'organizer_dashboard' %}is-active{% endif %}"><i class="fa-solid fa-chart-line"></i> Overview</a>
+        <a href="{% url 'events:my_events' %}" class="{% if cur == 'my_events' %}is-active{% endif %}"><i class="fa-solid fa-calendar-days"></i> Events</a>
+        <a href="{% url 'events:create_event' %}" class="{% if cur == 'create_event' %}is-active{% endif %}"><i class="fa-solid fa-circle-plus"></i> Create event</a>
+      </nav>
+      {% if event %}
+      <span class="side-label">This event</span>
+      <nav class="side-nav">
+        <a href="{% url 'events:ticket_management' event.id %}" class="{% if cur == 'ticket_management' or cur == 'ticket_checkin' %}is-active{% endif %}"><i class="fa-solid fa-users"></i> Attendees &amp; sales</a>
+        <a href="{% url 'events:edit_event' event.id %}" class="{% if cur == 'edit_event' %}is-active{% endif %}"><i class="fa-solid fa-pen"></i> Edit details</a>
+        <a href="{% url 'events:customize_event' event.id %}" class="{% if cur == 'customize_event' %}is-active{% endif %}"><i class="fa-solid fa-palette"></i> Branding</a>
+        <a href="{% url 'events:event_detail' event.id %}"><i class="fa-solid fa-arrow-up-right-from-square"></i> View public page</a>
+      </nav>
+      {% endif %}
+      <div class="side-foot">
+        <a href="{% url 'events:events_list' %}"><i class="fa-solid fa-compass"></i> Public site</a>
+        <a href="{% url 'users:profile' %}"><i class="fa-solid fa-id-badge"></i> Profile</a>
+        <a href="{% url 'users:logout' %}"><i class="fa-solid fa-right-from-bracket"></i> Log out</a>
+      </div>
+    </aside>
+    <div class="scrim" id="scrim"></div>
+
+    <div class="dash-main">
+      <header class="topbar">
+        <button class="icon-btn menu-btn" id="sidebarToggle" type="button" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+        <div class="crumbs">{% block crumbs %}{% endblock %}</div>
+        <div class="top-actions">
+          <button id="themeToggle" class="icon-btn" type="button" aria-label="Toggle theme"><i class="fas fa-moon"></i></button>
+          <a href="{% url 'events:create_event' %}" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> <span class="hide-sm">New event</span></a>
+          <span class="avatar" title="{{ user.username }}">{{ user.username|first|upper }}</span>
+        </div>
+      </header>
+      {% include "partials/messages.html" %}
+      <main class="dash-content">{% block content %}{% endblock %}</main>
+    </div>
+  </div>
+  {% endwith %}
+  <script src="{% static 'js/base.js' %}"></script>
+  <script>
+    (function () {
+      var sb = document.getElementById("sidebar"), sc = document.getElementById("scrim"), t = document.getElementById("sidebarToggle");
+      function set(o) { sb.classList.toggle("is-open", o); sc.classList.toggle("is-on", o); }
+      if (t) t.addEventListener("click", function () { set(!sb.classList.contains("is-open")); });
+      if (sc) sc.addEventListener("click", function () { set(false); });
+    })();
+  </script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

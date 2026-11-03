@@ -1,5 +1,7 @@
 import io
 import logging
+from collections import defaultdict
+from datetime import timedelta
 from decimal import Decimal, InvalidOperation
 from urllib.parse import quote
 
@@ -721,3 +723,77 @@ def download_ticket_pdf(request, reservation_id):
     response = HttpResponse(buffer, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="ticket_{reservation.ticket_code}.pdf"'
     return response
+
+
+@login_required
+def organizer_dashboard(request):
+    """Read-only analytics for the logged-in organizer (additive; no writes)."""
+    if not request.user.is_organizer:
+        messages.error(request, "You don't have permission to do that.")
+        return redirect("pages:home")
+
+    now = timezone.now()
+    events = list(
+        Event.objects.filter(organizer=request.user).prefetch_related("ticket_types")
+    )
+    reservations = list(
+        Reservation.objects.filter(ticket_type__event__organizer=request.user)
+        .select_related("user", "ticket_type", "ticket_type__event")
+    )
+    confirmed = [r for r in reservations if r.confirmed]
+    pending = [r for r in reservations if not r.confirmed and not r.is_expired]
+
+    revenue = sum((r.total_price for r in confirmed), Decimal("0"))
+    tickets_sold = sum(r.quantity for r in confirmed)
+    checked_in = sum(r.quantity for r in confirmed if r.is_used)
+
+    # Daily series for the last 30 days, bucketed by booking date.
+    today = timezone.localdate()
+    days = [today - timedelta(days=i) for i in range(29, -1, -1)]
+    rev_by_day = defaultdict(Decimal)
+    qty_by_day = defaultdict(int)
+    for r in confirmed:
+        d = timezone.localtime(r.created_at).date()
+        rev_by_day[d] += r.total_price
+        qty_by_day[d] += r.quantity
+    series = [
+        {"date": d.isoformat(), "label": d.strftime("%d %b"),
+         "revenue": float(rev_by_day[d]), "tickets": qty_by_day[d]}
+        for d in days
+    ]
+
+    per_event = {e.id: {"event": e, "revenue": Decimal("0"), "sold": 0} for e in events}
+    for r in confirmed:
+        row = per_event.get(r.ticket_type.event_id)
+        if row:
+            row["revenue"] += r.total_price
+            row["sold"] += r.quantity
+    event_rows = []
+    for row in per_event.values():
+        e = row["event"]
+        capacity = e.total_capacity
+        row["capacity"] = capacity
+        row["fill"] = round(100 * (capacity - e.available_tickets) / capacity) if capacity else 0
+        event_rows.append(row)
+    event_rows.sort(key=lambda x: x["revenue"], reverse=True)
+
+    chart_events = [
+        {"title": r["event"].title, "revenue": float(r["revenue"]),
+         "color": r["event"].theme_color}
+        for r in event_rows[:6]
+    ]
+
+    return render(request, "events/organizer_dashboard.html", {
+        "active": "dashboard",
+        "revenue": revenue,
+        "tickets_sold": tickets_sold,
+        "pending_count": len(pending),
+        "checked_in": checked_in,
+        "checkin_rate": round(100 * checked_in / tickets_sold) if tickets_sold else 0,
+        "upcoming_count": sum(1 for e in events if e.end_date >= now),
+        "event_count": len(events),
+        "event_rows": event_rows,
+        "recent": reservations[:8],
+        "series": series,
+        "chart_events": chart_events,
+    })

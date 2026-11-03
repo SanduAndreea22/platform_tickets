@@ -1,79 +1,227 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}TicketPlatform{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/home.css' %}">
-{% endblock %}
+{% block title %}TicketPlatform — Discover events. Book in seconds.{% endblock %}
 
 {% block content %}
-<section class="home">
 
-  <a href="{% url 'pages:how_it_works' %}" class="demo-banner">
-    👋 This is a portfolio/demo project — payments are in test mode and messages aren't actively monitored.
-    <strong>See how it works →</strong>
-  </a>
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="grid-bg"></div>
+  <div class="container hero-inner">
+    <div>
+      <a href="{% url 'pages:how_it_works' %}" class="pill-live"><b>DEMO</b> Stripe test mode — try the full flow, no real charges <i class="fa-solid fa-arrow-right"></i></a>
+      <h1>Events worth showing up for. <em>Tickets in seconds.</em></h1>
+      <p class="lede">Discover what's on, reserve instantly and walk in with a QR ticket that's actually checked at the door. For organizers: sell out with zero spreadsheets.</p>
 
-  <div class="home-hero">
-    <h1 class="home-title">TicketPlatform</h1>
-    <p class="home-subtitle">Choose your path.</p>
-  </div>
+      <form method="get" action="{% url 'events:events_list' %}" class="hero-search" role="search">
+        <input type="text" name="q" placeholder="Search events, venues, cities…" aria-label="Search events">
+        <button type="submit" class="btn btn-primary">Search <i class="fa-solid fa-arrow-right"></i></button>
+      </form>
 
-  <div class="home-grid">
-
-    <!-- Participant -->
-    <div class="role-card">
-      <div class="role-icon is-primary">
-        <i class="fa-solid fa-ticket"></i>
+      <div class="hero-cta">
+        <a href="{% url 'events:events_list' %}" class="btn btn-ghost btn-lg">Browse all events</a>
+        {% if user.is_authenticated and user.is_organizer %}
+          <a href="{% url 'events:organizer_dashboard' %}" class="btn btn-ghost btn-lg">Open dashboard</a>
+        {% else %}
+          <a href="{% url 'users:register' %}" class="btn btn-ghost btn-lg">Host an event</a>
+        {% endif %}
       </div>
 
-      <h2 class="role-title">Participant</h2>
-      <p class="role-text">
-        Discover upcoming events, reserve tickets, and manage your reservations.
-      </p>
-
-      <div class="role-actions">
-        <a href="{% url 'events:events_list' %}" class="btn btn-primary">Browse events</a>
-
-        {% if not user.is_authenticated %}
-          <a href="{% url 'users:register' %}" class="btn btn-ghost">Create account</a>
-        {% endif %}
+      <div class="hero-stats">
+        <div><b>{{ upcoming_count }}</b><span>upcoming {{ upcoming_count|pluralize:"event,events" }}</span></div>
+        <div><b>{{ tickets_confirmed }}</b><span>tickets issued</span></div>
+        <div><b>15 min</b><span>reservation hold</span></div>
       </div>
     </div>
 
-    <!-- Organizer -->
-    <div class="role-card">
-      <div class="role-icon is-accent">
-        <i class="fa-solid fa-calendar-plus"></i>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="ticket-mock t1">
+        <div class="t-art art"><i class="fa-solid fa-music"></i></div>
+        <div class="t-body">
+          <h4>Summer Beats Festival</h4>
+          <div class="t-meta">Sat · 16:00 · Main Stage</div>
+        </div>
+        <div class="t-tear"></div>
+        <div class="t-foot"><div><div class="t-meta" style="margin:0">Admit</div><b>1 × VIP</b></div><div class="qr-mini"></div></div>
       </div>
+      <div class="ticket-mock t2">
+        <div class="sales-mock">
+          <div class="k">Ticket sales · live</div>
+          <div class="v">+248</div>
+          <div class="spark">
+            <i style="height:30%"></i><i style="height:48%"></i><i style="height:38%"></i><i style="height:62%"></i><i style="height:55%"></i><i style="height:78%"></i><i style="height:92%"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-      <h2 class="role-title">Organizer</h2>
-      <p class="role-text">
-        Create events, define ticket types, and track reservations in your dashboard.
-      </p>
+<!-- ============ TRUST ============ -->
+<section class="trust">
+  <div class="container trust-row">
+    <div class="trust-item"><span class="ic"><i class="fa-solid fa-shield-halved"></i></span><div><b>Secure checkout</b><span>Payments by Stripe</span></div></div>
+    <div class="trust-item"><span class="ic"><i class="fa-solid fa-qrcode"></i></span><div><b>Scannable QR tickets</b><span>Checked once, at the door</span></div></div>
+    <div class="trust-item"><span class="ic"><i class="fa-solid fa-bolt"></i></span><div><b>Live availability</b><span>No overselling, ever</span></div></div>
+    <div class="trust-item"><span class="ic"><i class="fa-solid fa-file-pdf"></i></span><div><b>Instant PDF tickets</b><span>Download or show on phone</span></div></div>
+  </div>
+</section>
 
-      <div class="role-actions">
+<!-- ============ FEATURED ============ -->
+<section class="section">
+  <div class="container">
+    <div class="section-head reveal-up">
+      <div>
+        <span class="eyebrow">Featured</span>
+        <h2>Happening next</h2>
+        <p>The soonest events you can book right now.</p>
+      </div>
+      <a href="{% url 'events:events_list' %}" class="link-arrow">View all events <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+
+    {% if featured_events %}
+    <div class="feature-grid">
+      {% for event in featured_events|slice:":1" %}
+      <article class="event-feature reveal-up">
+        <div class="bg">
+          {% if event.image %}<img src="{{ event.image.url }}" alt="">{% else %}<div class="art" style="--c: {{ event.theme_color }}"><i class="fa-solid fa-ticket"></i></div>{% endif %}
+        </div>
+        <div class="inner">
+          <div class="row"><span class="badge glass-badge">{{ event.start_date|date:"D, d M · H:i" }}</span>
+            {% if event.is_active %}<span class="badge glass-badge badge-live">Live now</span>{% endif %}</div>
+          <h3><a href="{% url 'events:event_detail' event.pk %}" class="stretched">{{ event.title }}</a></h3>
+          <div class="meta-line"><i class="fa-solid fa-location-dot"></i>{{ event.location }}</div>
+          <div class="row">
+            <div class="price">{% if event.starting_price is not None %}<small>From</small>{{ event.starting_price }} {{ CURRENCY }}{% else %}<small>Price</small>TBA{% endif %}</div>
+            <span class="btn btn-primary">Get tickets <i class="fa-solid fa-arrow-right"></i></span>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+
+      <div class="stack">
+        {% for event in featured_events|slice:"1:3" %}
+        <article class="event-feature compact reveal-up">
+          <div class="bg">
+            {% if event.image %}<img src="{{ event.image.url }}" alt="">{% else %}<div class="art" style="--c: {{ event.theme_color }}"><i class="fa-solid fa-ticket"></i></div>{% endif %}
+          </div>
+          <div class="inner">
+            <span class="badge glass-badge no-dot">{{ event.start_date|date:"d M · H:i" }}</span>
+            <h3><a href="{% url 'events:event_detail' event.pk %}" class="stretched">{{ event.title }}</a></h3>
+            <div class="meta-line"><i class="fa-solid fa-location-dot"></i>{{ event.location }}</div>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+    </div>
+    {% else %}
+    <div class="empty">
+      <div class="ic"><i class="fa-regular fa-calendar"></i></div>
+      <h3>No upcoming events yet</h3>
+      <p>New events land here the moment organizers publish them.</p>
+      <a href="{% url 'users:register' %}" class="btn btn-primary">Host the first one</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- ============ CATEGORIES ============ -->
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="section-head reveal-up">
+      <div><span class="eyebrow">Explore</span><h2>Browse by vibe</h2></div>
+    </div>
+    <div class="cat-grid">
+      <a class="cat reveal-up" href="{% url 'events:events_list' %}?q=music"><span class="ic"><i class="fa-solid fa-music"></i></span><div><b>Music</b><br><span>Concerts &amp; festivals</span></div></a>
+      <a class="cat reveal-up" href="{% url 'events:events_list' %}?q=tech"><span class="ic"><i class="fa-solid fa-microchip"></i></span><div><b>Tech</b><br><span>Meetups &amp; conferences</span></div></a>
+      <a class="cat reveal-up" href="{% url 'events:events_list' %}?q=art"><span class="ic"><i class="fa-solid fa-palette"></i></span><div><b>Arts</b><br><span>Exhibitions &amp; theatre</span></div></a>
+      <a class="cat reveal-up" href="{% url 'events:events_list' %}?q=food"><span class="ic"><i class="fa-solid fa-utensils"></i></span><div><b>Food &amp; drink</b><br><span>Tastings &amp; markets</span></div></a>
+      <a class="cat reveal-up" href="{% url 'events:events_list' %}?q=sport"><span class="ic"><i class="fa-solid fa-person-running"></i></span><div><b>Sports</b><br><span>Runs &amp; tournaments</span></div></a>
+      <a class="cat reveal-up" href="{% url 'events:events_list' %}?q=workshop"><span class="ic"><i class="fa-solid fa-graduation-cap"></i></span><div><b>Workshops</b><br><span>Learn something new</span></div></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ UPCOMING GRID ============ -->
+{% if featured_events|length > 3 %}
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="section-head reveal-up">
+      <div><span class="eyebrow">Upcoming</span><h2>More to look forward to</h2></div>
+    </div>
+    <div class="event-grid">
+      {% for event in featured_events|slice:"3:" %}
+        {% include "partials/event_card.html" %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ============ POPULAR ============ -->
+{% if popular_events %}
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="section-head reveal-up">
+      <div><span class="eyebrow">Trending</span><h2>Popular right now</h2><p>Ranked by tickets already taken.</p></div>
+    </div>
+    <div class="rank-list">
+      {% for event in popular_events %}
+      <article class="card card-hover rank reveal-up">
+        <div class="n">{{ forloop.counter }}</div>
+        <div class="thumb">
+          {% if event.image %}<img src="{{ event.image.url }}" alt="" loading="lazy">{% else %}<div class="art" style="--c: {{ event.theme_color }}"><i class="fa-solid fa-ticket"></i></div>{% endif %}
+        </div>
+        <div style="min-width:0">
+          <h3><a href="{% url 'events:event_detail' event.pk %}" class="stretched">{{ event.title }}</a></h3>
+          <div class="meta-line muted" style="margin-top:4px">{{ event.start_date|date:"d M" }} · {{ event.location }}</div>
+          <div class="demand" title="{{ event.demand_pct }}% booked"><i style="width: {{ event.demand_pct }}%"></i></div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ============ ROLES ============ -->
+<section class="section" style="padding-top:0">
+  <div class="container role-grid">
+    <div class="role-card light reveal-up">
+      <span class="ic"><i class="fa-solid fa-ticket"></i></span>
+      <h3>For attendees</h3>
+      <p>Find something great, reserve in a click and keep every ticket in one place.</p>
+      <ul>
+        <li><i class="fa-solid fa-check"></i>Hold your seats for 15 minutes while you pay</li>
+        <li><i class="fa-solid fa-check"></i>Digital tickets with QR codes + PDF download</li>
+        <li><i class="fa-solid fa-check"></i>Manage reservations anytime</li>
+      </ul>
+      <div class="cta-actions">
+        <a href="{% url 'events:events_list' %}" class="btn btn-primary">Browse events</a>
+        {% if not user.is_authenticated %}<a href="{% url 'users:register' %}" class="btn btn-ghost">Create account</a>{% endif %}
+      </div>
+    </div>
+    <div class="role-card dark reveal-up">
+      <span class="ic"><i class="fa-solid fa-chart-line"></i></span>
+      <h3>For organizers</h3>
+      <p>Everything to sell tickets and run the door — in one calm dashboard.</p>
+      <ul>
+        <li><i class="fa-solid fa-check"></i>Revenue, sales and check-in analytics</li>
+        <li><i class="fa-solid fa-check"></i>Multiple ticket tiers with live stock</li>
+        <li><i class="fa-solid fa-check"></i>Scan or type a code to check guests in</li>
+      </ul>
+      <div class="cta-actions">
         {% if user.is_authenticated and user.is_organizer %}
-          <a href="{% url 'events:create_event' %}" class="btn btn-primary">Create event</a>
-          <a href="{% url 'events:my_events' %}" class="btn btn-ghost">My events</a>
+          <a href="{% url 'events:organizer_dashboard' %}" class="btn btn-primary">Open dashboard</a>
+          <a href="{% url 'events:create_event' %}" class="btn btn-ghost">Create event</a>
         {% else %}
           <a href="{% url 'users:register' %}" class="btn btn-primary">Become an organizer</a>
-          <a href="{% url 'pages:contact' %}" class="btn btn-ghost">Contact support</a>
+          <a href="{% url 'pages:contact' %}" class="btn btn-ghost">Talk to us</a>
         {% endif %}
       </div>
     </div>
-
   </div>
-
 </section>
+
 {% endblock %}
-
-
-
-
-
-
-
-
-

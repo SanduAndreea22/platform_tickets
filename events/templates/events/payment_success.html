@@ -1,34 +1,13 @@
 {% extends 'base.html' %}
-{% load static %}
 {% block title %}Payment successful - TicketPlatform{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/payment.css' %}">
-{% endblock %}
-
 {% block content %}
-
 <section class="result-page">
-
-  <div class="result-icon is-success">✅</div>
-
-  <h1>Payment successful!</h1>
-
-  <p>
-    Thanks for your purchase! Your reservation is now <strong>confirmed</strong>,
-    and your tickets have been added to your account.
-  </p>
-
+  <div class="result-icon is-success"><i class="fa-solid fa-check"></i></div>
+  <h1>You're in!</h1>
+  <p>Payment received. Your reservation is <strong>confirmed</strong> and your tickets are ready in your account.</p>
   <div class="result-actions">
-    <a href="{% url 'events:my_tickets' %}" class="btn btn-primary">
-      🎟️ View my tickets
-    </a>
-
-    <a href="{% url 'events:events_list' %}" class="btn btn-ghost">
-      ↩️ Back to events
-    </a>
+    <a href="{% url 'events:my_tickets' %}" class="btn btn-primary btn-lg"><i class="fa-solid fa-ticket"></i> View my tickets</a>
+    <a href="{% url 'events:events_list' %}" class="btn btn-ghost btn-lg">Back to events</a>
   </div>
-
 </section>
-
 {% endblock %}

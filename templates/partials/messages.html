@@ -1,0 +1,11 @@
+{% if messages %}
+  <div class="messages" role="status" aria-live="polite">
+    {% for message in messages %}
+      <div class="message-card {{ message.tags }}">
+        <i class="m-icon fa-solid {% if message.tags == 'success' %}fa-circle-check{% elif message.tags == 'error' %}fa-circle-exclamation{% elif message.tags == 'warning' %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %}"></i>
+        <span>{{ message }}</span>
+        <button type="button" class="toast-close" aria-label="Dismiss"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}

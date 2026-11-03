@@ -1,0 +1,29 @@
+{# Expects `event` in context. Optional: show_status=True #}
+<article class="card card-hover event-card reveal-up">
+  <div class="media">
+    {% if event.image %}
+      <img src="{{ event.image.url }}" alt="" loading="lazy">
+    {% else %}
+      <div class="art" style="--c: {{ event.theme_color }}"><i class="fa-solid fa-ticket"></i></div>
+    {% endif %}
+    <div class="date-pill"><span>{{ event.start_date|date:"M" }}</span><b>{{ event.start_date|date:"d" }}</b></div>
+    <div class="flag">
+      {% if event.is_past %}<span class="badge glass-badge no-dot">Ended</span>
+      {% elif event.is_active %}<span class="badge glass-badge badge-live">Live</span>
+      {% elif event.available_tickets == 0 and event.total_capacity %}<span class="badge badge-danger no-dot">Sold out</span>
+      {% endif %}
+    </div>
+  </div>
+  <div class="body">
+    <h3><a href="{% url 'events:event_detail' event.pk %}" class="stretched">{{ event.title }}</a></h3>
+    <p class="desc">{{ event.description }}</p>
+    <div class="meta-line"><i class="fa-solid fa-location-dot"></i><span>{{ event.location }}</span></div>
+    <div class="meta-line"><i class="fa-regular fa-clock"></i><span>{{ event.start_date|date:"D, d M · H:i" }}</span></div>
+    <div class="foot">
+      <div class="price">
+        {% if event.starting_price is not None %}<small>From</small>{{ event.starting_price }} {{ CURRENCY }}{% else %}<small>Price</small>TBA{% endif %}
+      </div>
+      <span class="arrow-go"><i class="fa-solid fa-arrow-right"></i></span>
+    </div>
+  </div>
+</article>

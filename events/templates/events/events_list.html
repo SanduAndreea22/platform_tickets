@@ -1,102 +1,55 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}All events - TicketPlatform{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/events.css' %}">
-{% endblock %}
+{% block title %}Discover events - TicketPlatform{% endblock %}
 
 {% block content %}
 
-<section class="events-section">
+<section class="discover-head">
+  <div class="container">
+    <span class="eyebrow" style="color:var(--violet-300)">Discover</span>
+    <h1 style="margin-top:10px">Find your next night out.</h1>
+    <p>Concerts, meetups, workshops and more — book in seconds.</p>
 
-  <!-- Header -->
-  <div class="events-header">
-    <h1>🎉 All available events</h1>
-    <p>Discover experiences, concerts, and unique events</p>
+    <form method="get" class="filter-bar" role="search">
+      <label class="f"><i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" name="q" value="{{ query }}" placeholder="Search by title or location…" aria-label="Search">
+      </label>
+      <label class="f date"><i class="fa-regular fa-calendar"></i>
+        <input type="date" name="date" value="{{ date }}" aria-label="Date">
+      </label>
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
+    <div class="quick-chips">
+      <a class="chip" href="?q=music"><i class="fa-solid fa-music"></i> Music</a>
+      <a class="chip" href="?q=tech"><i class="fa-solid fa-microchip"></i> Tech</a>
+      <a class="chip" href="?q=art"><i class="fa-solid fa-palette"></i> Arts</a>
+      <a class="chip" href="?q=food"><i class="fa-solid fa-utensils"></i> Food</a>
+      <a class="chip" href="?q=workshop"><i class="fa-solid fa-graduation-cap"></i> Workshops</a>
+    </div>
+  </div>
+</section>
+
+<section class="container">
+  <div class="result-bar">
+    <h2>{% if query or date %}Results{% else %}All events{% endif %} <span class="muted" style="font-weight:500">· {{ events|length }}</span></h2>
+    {% if query or date %}<a href="{% url 'events:events_list' %}" class="btn btn-ghost btn-sm"><i class="fa-solid fa-xmark"></i> Clear filters</a>{% endif %}
   </div>
 
-  <!-- Search -->
-  <form method="get" class="events-search">
-
-    <div class="search-input">
-      <i class="fa-solid fa-magnifying-glass"></i>
-      <input
-        type="text"
-        name="q"
-        value="{{ query }}"
-        placeholder="Search for an event..."
-      >
-    </div>
-
-    <div class="search-date">
-      <i class="fa-solid fa-calendar"></i>
-      <input
-        type="date"
-        name="date"
-        value="{{ date }}"
-      >
-    </div>
-
-    <button type="submit" class="btn-search">
-      Search
-    </button>
-  </form>
-
-  <!-- Grid -->
-  <div class="events-grid">
-
+  {% if events %}
+  <div class="event-grid">
     {% for event in events %}
-      <div class="event-card">
-
-        {% if event.image %}
-          <img src="{{ event.image.url }}" alt="{{ event.title }}">
-        {% else %}
-          <div class="image-fallback" style="--fallback-color: {{ event.theme_color }};">
-            <i class="fa-solid fa-ticket"></i>
-          </div>
-        {% endif %}
-
-        <div class="event-body">
-          <h2>{{ event.title }}</h2>
-
-          <p>{{ event.description|truncatewords:20 }}</p>
-
-          <div class="event-meta">
-            <span>
-              <i class="fa-solid fa-location-dot"></i>
-              {{ event.location }}
-            </span>
-            <span>
-              <i class="fa-solid fa-calendar"></i>
-              {{ event.start_date|date:"d M Y H:i" }}
-            </span>
-            <span>
-              <i class="fa-solid fa-tag"></i>
-              {% if event.starting_price is not None %}
-                From {{ event.starting_price }} {{ CURRENCY }}
-              {% else %}
-                Price TBA
-              {% endif %}
-            </span>
-          </div>
-
-          <a href="{% url 'events:event_detail' event.pk %}" class="btn-details">
-            View details →
-          </a>
-        </div>
-
-      </div>
-
-    {% empty %}
-      <div class="events-empty">
-        😔 No events match your search. Try a different keyword or date.
-      </div>
+      {% include "partials/event_card.html" %}
     {% endfor %}
-
   </div>
-
+  {% else %}
+  <div class="empty">
+    <div class="ic"><i class="fa-solid fa-magnifying-glass"></i></div>
+    <h3>No events match your search</h3>
+    <p>Try a different keyword or date, or clear the filters to see everything.</p>
+    <a href="{% url 'events:events_list' %}" class="btn btn-primary">See all events</a>
+  </div>
+  {% endif %}
 </section>
 
 {% endblock %}
-

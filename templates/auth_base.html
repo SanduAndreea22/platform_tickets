@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="auth">
+  <aside class="auth-aside">
+    <a href="{% url 'pages:home' %}" class="brand" style="color:#fff"><span class="brand-mark"><i class="fa-solid fa-ticket"></i></span><span>TicketPlatform</span></a>
+    <div>
+      <h2>{% block aside_title %}The calm way to buy and sell tickets.{% endblock %}</h2>
+      <p>{% block aside_text %}Instant reservations, secure checkout and QR tickets that are scanned once, at the door.{% endblock %}</p>
+      <ul>
+        <li><i class="fa-solid fa-bolt"></i> Reserve in seconds, pay when ready</li>
+        <li><i class="fa-solid fa-qrcode"></i> QR tickets &amp; PDF downloads</li>
+        <li><i class="fa-solid fa-chart-line"></i> Live sales analytics for organizers</li>
+      </ul>
+    </div>
+    <small style="color:#8d94bd">Portfolio demo · Stripe test mode</small>
+  </aside>
+  <div class="auth-main"><div class="auth-card">{% block auth_card %}{% endblock %}</div></div>
+</section>
+{% endblock %}

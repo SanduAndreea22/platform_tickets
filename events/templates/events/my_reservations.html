@@ -1,147 +1,67 @@
 {% extends 'base.html' %}
 {% load static %}
-
 {% block title %}My Reservations - TicketPlatform{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/reservations.css' %}">
-{% endblock %}
-
 {% block content %}
-
-<section class="reservations">
-
-  <!-- HEADER -->
-  <div class="about-card reservations-header">
-    <h1 class="section-title">📅 My Reservations</h1>
-    <p class="section-subtitle">
-      View pending and confirmed reservations.
-    </p>
-  </div>
+<div class="container">
+  <header class="page-head">
+    <span class="eyebrow">Bookings</span>
+    <h1 style="margin-top:10px">My reservations</h1>
+    <p>Pending holds and confirmed bookings in one place.</p>
+  </header>
 
   {% if reservations %}
-    <div class="reservations-grid">
-
-      {% for r in reservations %}
-        <article class="reservation-card">
-
-          {% if r.ticket_type.event.image %}
-            <img
-              src="{{ r.ticket_type.event.image.url }}"
-              alt="{{ r.ticket_type.event.title }}"
-              class="reservation-image"
-            >
-          {% else %}
-            <div
-              class="reservation-image image-fallback"
-              style="--fallback-color: {{ r.ticket_type.event.theme_color }};"
-            >
-              <i class="fa-solid fa-ticket"></i>
-            </div>
-          {% endif %}
-
-          <div class="reservation-content">
-
-            <div class="reservation-top">
-              <h2 class="reservation-title">
-                {{ r.ticket_type.event.title }}
-              </h2>
-
-              {% if r.confirmed %}
-                <span class="badge badge-success">
-                  ✅ Confirmed
-                </span>
-              {% else %}
-                <span class="badge badge-warning">
-                  ⏳ Pending
-                </span>
-              {% endif %}
-            </div>
-
-            <div class="reservation-meta">
-              <span>
-                <i class="fa-solid fa-location-dot"></i>
-                {{ r.ticket_type.event.location }}
-              </span>
-
-              <span>
-                <i class="fa-solid fa-calendar"></i>
-                {{ r.ticket_type.event.start_date|date:"d M Y H:i" }}
-              </span>
-            </div>
-
-            <div class="reservation-details">
-
-              <p class="reservation-category">
-                Ticket category: <strong>{{ r.ticket_type.name }}</strong>
-              </p>
-
-              <div class="reservation-row">
-                <span>Quantity: <strong>{{ r.quantity }}</strong></span>
-                <span class="reservation-price">
-                  {{ r.ticket_type.price }} {{ CURRENCY }}
-                </span>
-              </div>
-
-            </div>
-
-            {% if not r.confirmed %}
-              <p class="reservation-expiry" data-expires-at="{{ r.expires_at|date:'c' }}">
-                ⏳ Hold expires at {{ r.expires_at|date:"d M Y H:i" }}
-                (<span class="reservation-countdown">calculating…</span>)
-                — pay before then or the tickets are released back to stock.
-              </p>
-              <div class="reservation-actions">
-
-                <a href="{% url 'events:payment_page' r.id %}" class="btn btn-success">
-                  💳 Pay now
-                </a>
-
-                <form method="post" class="reservation-form">
-                  {% csrf_token %}
-                  <input type="hidden" name="reservation_id" value="{{ r.id }}">
-                  <button type="submit" class="btn btn-danger">
-                    ❌ Cancel reservation
-                  </button>
-                </form>
-
-              </div>
-            {% else %}
-              <div class="reservation-confirmed">
-                🎟️ Your ticket is confirmed
-              </div>
-            {% endif %}
-
-          </div>
-
-        </article>
-      {% endfor %}
-
-    </div>
-
-  {% else %}
-    <div class="about-cta-card reservations-empty">
-      <h2 class="section-title">No reservations yet</h2>
-      <p class="section-subtitle">
-        You don’t have any reservations yet.
-      </p>
-
-      <div class="cta-actions">
-        <a href="{% url 'events:events_list' %}" class="btn btn-primary">
-          🔍 Browse Available Events
-        </a>
+  <div class="res-list">
+    {% for r in reservations %}
+    {% with event=r.ticket_type.event %}
+    <article class="card res-card reveal-up">
+      <div class="thumb">{% if event.image %}<img src="{{ event.image.url }}" alt="" loading="lazy">{% else %}<div class="art" style="--c: {{ event.theme_color }}"><i class="fa-solid fa-ticket"></i></div>{% endif %}</div>
+      <div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <h2><a href="{% url 'events:event_detail' event.id %}">{{ event.title }}</a></h2>
+          {% if r.confirmed %}<span class="badge badge-success">Confirmed</span>{% else %}<span class="badge badge-warning">Pending payment</span>{% endif %}
+        </div>
+        <div class="row">
+          <span class="meta-line"><i class="fa-regular fa-calendar"></i>{{ event.start_date|date:"d M Y · H:i" }}</span>
+          <span class="meta-line"><i class="fa-solid fa-location-dot"></i>{{ event.location }}</span>
+          <span class="meta-line"><i class="fa-solid fa-ticket"></i>{{ r.ticket_type.name }} × {{ r.quantity }}</span>
+        </div>
+        {% if not r.confirmed %}
+        <p class="reservation-expiry" data-expires-at="{{ r.expires_at|date:'c' }}">
+          <i class="fa-regular fa-clock"></i>
+          <span>Hold expires {{ r.expires_at|date:"H:i" }} · <span class="reservation-countdown">calculating…</span></span>
+        </p>
+        {% endif %}
       </div>
-    </div>
+      <div class="res-side">
+        <div class="price">{{ r.total_price }} <small>{{ CURRENCY }}</small></div>
+        {% if not r.confirmed %}
+        <div class="res-actions">
+          <a href="{% url 'events:payment_page' r.id %}" class="btn btn-primary btn-sm">Pay now</a>
+          <form method="post" onsubmit="return confirm('Cancel this reservation and release the tickets?');">
+            {% csrf_token %}
+            <input type="hidden" name="reservation_id" value="{{ r.id }}">
+            <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+          </form>
+        </div>
+        {% else %}
+        <a href="{% url 'events:my_tickets' %}" class="btn btn-ghost btn-sm"><i class="fa-solid fa-qrcode"></i> View ticket</a>
+        {% endif %}
+      </div>
+    </article>
+    {% endwith %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty">
+    <div class="ic"><i class="fa-regular fa-calendar-check"></i></div>
+    <h2>No reservations yet</h2>
+    <p>Reserve tickets to an event and they'll show up here.</p>
+    <a href="{% url 'events:events_list' %}" class="btn btn-primary">Browse events</a>
+  </div>
   {% endif %}
-
-</section>
-
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script src="{% static 'js/reservation_countdown.js' %}"></script>
 {% endblock %}
-
-
-
-

@@ -5,7 +5,8 @@ from django.contrib import messages
 from .forms import ContactForm
 from .models import SupportMessage
 from django.utils import timezone
-from events.models import Event
+from django.db.models import Sum
+from events.models import Event, Reservation
 
 SESSION_THREAD_KEY = "contact_thread_id"
 
@@ -77,7 +78,21 @@ def home(request):
         .order_by("start_date")[:6]
     )
 
+    # Extra context for the redesigned homepage (additive; featured_events is
+    # unchanged). "Popular" = most tickets taken so far among upcoming events.
+    popular_events = []
+    for event in featured_events:
+        total = event.total_capacity
+        taken = total - event.available_tickets
+        event.demand_pct = round(100 * taken / total) if total else 0
+        event.taken = taken
+        popular_events.append(event)
+    popular_events = sorted(popular_events, key=lambda e: e.taken, reverse=True)[:4]
+
     return render(request, "pages/home.html", {
         "featured_events": featured_events,
+        "popular_events": popular_events,
+        "upcoming_count": Event.objects.filter(end_date__gte=now).count(),
+        "tickets_confirmed": Reservation.objects.filter(confirmed=True).aggregate(
+            n=Sum("quantity"))["n"] or 0,
     })
-

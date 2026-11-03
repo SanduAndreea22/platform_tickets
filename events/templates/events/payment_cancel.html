@@ -1,27 +1,12 @@
 {% extends 'base.html' %}
-{% load static %}
 {% block title %}Payment canceled - TicketPlatform{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/payment.css' %}">
-{% endblock %}
-
 {% block content %}
-
 <section class="result-page">
-
-  <div class="result-icon is-cancel">⚠️</div>
-
+  <div class="result-icon is-cancel"><i class="fa-solid fa-triangle-exclamation"></i></div>
   <h1>Payment canceled</h1>
-
-  <p>Your payment was not completed. You can retry anytime from your reservations page.</p>
-
+  <p>Nothing was charged. You can retry anytime from your reservations while your seats are still held.</p>
   <div class="result-actions">
-    <a href="{% url 'events:my_reservations' %}" class="btn btn-primary">
-      🔁 Back to my reservations
-    </a>
+    <a href="{% url 'events:my_reservations' %}" class="btn btn-primary btn-lg">Back to my reservations</a>
   </div>
-
 </section>
-
 {% endblock %}

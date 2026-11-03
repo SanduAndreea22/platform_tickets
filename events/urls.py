@@ -16,6 +16,7 @@ urlpatterns = [
     path('<int:event_id>/tickets/', views.ticket_management, name='ticket_management'),
     path('checkin/<str:ticket_code>/', views.ticket_checkin, name='ticket_checkin'),
     path('<int:event_id>/customize/', views.customize_event, name='customize_event'),
+    path('dashboard/', views.organizer_dashboard, name='organizer_dashboard'),
     path('my-events/', views.my_events, name='my_events'),
 
     path('payment/<int:reservation_id>/', views.payment_page, name='payment_page'),

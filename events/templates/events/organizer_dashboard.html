@@ -1,0 +1,89 @@
+{% extends "dashboard_base.html" %}
+{% block title %}Overview - Organizer - TicketPlatform{% endblock %}
+{% block crumbs %}<b>Overview</b>{% endblock %}
+
+{% block content %}
+<div class="dash-head">
+  <div><h1>Welcome back, {{ user.username }}</h1><p>Here's how your events are performing.</p></div>
+  <div class="actions">
+    <a href="{% url 'events:my_events' %}" class="btn btn-ghost">Manage events</a>
+    <a href="{% url 'events:create_event' %}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Create event</a>
+  </div>
+</div>
+
+<div class="kpis">
+  <div class="card kpi accent"><div class="top">Total revenue <span class="ic"><i class="fa-solid fa-wallet"></i></span></div>
+    <div class="val tnum">{{ revenue }} <small>{{ CURRENCY }}</small></div><div class="sub">From confirmed reservations</div></div>
+  <div class="card kpi"><div class="top">Tickets sold <span class="ic"><i class="fa-solid fa-ticket"></i></span></div>
+    <div class="val tnum">{{ tickets_sold }}</div><div class="sub">{{ pending_count }} pending {{ pending_count|pluralize:"hold,holds" }}</div></div>
+  <div class="card kpi"><div class="top">Check-in rate <span class="ic"><i class="fa-solid fa-qrcode"></i></span></div>
+    <div class="val tnum">{{ checkin_rate }}<small>%</small></div><div class="sub">{{ checked_in }} of {{ tickets_sold }} tickets scanned</div></div>
+  <div class="card kpi"><div class="top">Events <span class="ic"><i class="fa-solid fa-calendar-days"></i></span></div>
+    <div class="val tnum">{{ event_count }}</div><div class="sub">{{ upcoming_count }} upcoming or live</div></div>
+</div>
+
+<div class="panel-grid">
+  <section class="card panel">
+    <div class="panel-head">
+      <div><h2>Sales over time</h2><p>By booking date, confirmed reservations</p></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div class="seg" id="metricSeg"><button class="is-on" data-metric="revenue">Revenue</button><button data-metric="tickets">Tickets</button></div>
+        <div class="seg" id="rangeSeg"><button data-range="7">7d</button><button data-range="14">14d</button><button class="is-on" data-range="30">30d</button></div>
+      </div>
+    </div>
+    <div class="chart" id="salesChart"></div>
+  </section>
+
+  <section class="card panel">
+    <div class="panel-head"><div><h2>Revenue by event</h2><p>Top performers</p></div></div>
+    <div class="hbar" id="eventBars"></div>
+  </section>
+</div>
+
+<section class="panel-wrap" style="display:grid;gap:16px">
+  <div class="panel-head" style="margin:0"><h2 style="font-size:18px">Event performance</h2><a href="{% url 'events:my_events' %}" class="link-arrow">All events <i class="fa-solid fa-arrow-right"></i></a></div>
+  {% if event_rows %}
+  <div class="table-wrap"><table class="dtable">
+    <thead><tr><th>Event</th><th>Date</th><th>Sold / capacity</th><th class="right">Revenue</th><th></th></tr></thead>
+    <tbody>
+    {% for row in event_rows %}
+      <tr>
+        <td><div class="cell-event"><div class="thumb">{% if row.event.image %}<img src="{{ row.event.image.url }}" alt="">{% else %}<div class="art" style="--c: {{ row.event.theme_color }}"><i class="fa-solid fa-ticket"></i></div>{% endif %}</div>
+          <div><b>{{ row.event.title }}</b><small>{{ row.event.location }}</small></div></div></td>
+        <td class="tnum">{{ row.event.start_date|date:"d M Y" }}</td>
+        <td class="tnum">{{ row.sold }} / {{ row.capacity }}<div class="mini-bar"><i style="width: {{ row.fill }}%"></i></div></td>
+        <td class="right tnum"><b>{{ row.revenue }} {{ CURRENCY }}</b></td>
+        <td class="right"><a href="{% url 'events:ticket_management' row.event.id %}" class="btn btn-ghost btn-sm">Attendees</a></td>
+      </tr>
+    {% endfor %}
+    </tbody></table></div>
+  {% else %}
+  <div class="empty"><div class="ic"><i class="fa-solid fa-calendar-plus"></i></div><h3>Create your first event</h3><p>Add an event and ticket types — sales analytics will appear here.</p><a href="{% url 'events:create_event' %}" class="btn btn-primary">Create event</a></div>
+  {% endif %}
+
+  {% if recent %}
+  <div class="panel-head" style="margin:14px 0 0"><h2 style="font-size:18px">Recent reservations</h2></div>
+  <div class="table-wrap"><table class="dtable">
+    <thead><tr><th>Participant</th><th>Event</th><th>Ticket</th><th>Qty</th><th>Status</th><th class="right">Total</th></tr></thead>
+    <tbody>
+    {% for r in recent %}
+      <tr>
+        <td><div class="cell-user"><span class="avatar">{{ r.user.username|first|upper }}</span>{{ r.user.username }}</div></td>
+        <td>{{ r.ticket_type.event.title }}</td><td>{{ r.ticket_type.name }}</td><td class="tnum">{{ r.quantity }}</td>
+        <td>{% if r.confirmed %}<span class="badge badge-success">Confirmed</span>{% else %}<span class="badge badge-warning">Pending</span>{% endif %}</td>
+        <td class="right tnum">{{ r.total_price }} {{ CURRENCY }}</td>
+      </tr>
+    {% endfor %}
+    </tbody></table></div>
+  {% endif %}
+</section>
+
+{{ series|json_script:"series-data" }}
+{{ chart_events|json_script:"events-data" }}
+{% endblock %}
+
+{% block extra_js %}
+{% load static %}
+<script>window.CURRENCY = "{{ CURRENCY }}";</script>
+<script src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %}

@@ -1,115 +1,33 @@
 {% extends "base.html" %}
-{% load static %}
 {% block title %}My profile - TicketPlatform{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/profile.css' %}">
-{% endblock %}
-
 {% block content %}
+<div class="container" style="max-width:960px">
+  <header class="page-head"><span class="eyebrow">Account</span><h1 style="margin-top:10px">Your profile</h1></header>
 
-<section class="profile-section">
-
-  <div class="profile-card">
-
-    <!-- Header -->
-    <div class="profile-header">
-
-      <div class="profile-info">
-        <div class="profile-avatar">
-          {{ user.username|first|upper }}
-        </div>
-
-        <div>
-          <h2 class="profile-name">{{ user.username }}</h2>
-          <p class="profile-email">{{ user.email }}</p>
-
-          {% if user.is_organizer %}
-            <span class="profile-badge organizer">
-              🧑‍💼 Organizer
-            </span>
-          {% else %}
-            <span class="profile-badge participant">
-              🎟️ Participant
-            </span>
-          {% endif %}
-        </div>
-      </div>
-
-      <form method="POST" action="{% url 'users:logout' %}">
-        {% csrf_token %}
-        <button type="submit" class="logout-btn" title="Logout">
-          <i class="fa-solid fa-arrow-right-from-bracket"></i>
-        </button>
-      </form>
-
+  <div class="card profile-head">
+    <div class="avatar">{{ user.username|first|upper }}</div>
+    <div>
+      <h1>{{ user.username }}</h1>
+      <p class="muted">{{ user.email }}</p>
+      <div style="margin-top:8px">{% if user.is_organizer %}<span class="badge badge-primary">Organizer</span>{% else %}<span class="badge badge-info">Participant</span>{% endif %}</div>
     </div>
-
-    <!-- Menu grid -->
-    <div class="profile-grid">
-
-      {% if user.is_participant %}
-
-        <a href="{% url 'events:my_tickets' %}" class="profile-card-link">
-          <div class="card-icon primary">
-            <i class="fa-solid fa-ticket"></i>
-          </div>
-          <h3>My tickets</h3>
-          <p>See your purchased tickets</p>
-        </a>
-
-        <a href="{% url 'events:my_reservations' %}" class="profile-card-link">
-          <div class="card-icon accent">
-            <i class="fa-solid fa-calendar-check"></i>
-          </div>
-          <h3>My reservations</h3>
-          <p>Manage pending & confirmed reservations</p>
-        </a>
-
-        <a href="{% url 'events:events_list' %}" class="profile-card-link">
-          <div class="card-icon success">
-            <i class="fa-solid fa-magnifying-glass"></i>
-          </div>
-          <h3>Browse events</h3>
-          <p>Explore available events</p>
-        </a>
-
-      {% endif %}
-
-      {% if user.is_organizer %}
-
-        <a href="{% url 'events:my_events' %}" class="profile-card-link">
-          <div class="card-icon primary">
-            <i class="fa-solid fa-rectangle-list"></i>
-          </div>
-          <h3>My events</h3>
-          <p>Manage your events</p>
-        </a>
-
-        <a href="{% url 'events:create_event' %}" class="profile-card-link">
-          <div class="card-icon accent">
-            <i class="fa-solid fa-circle-plus"></i>
-          </div>
-          <h3>Create event</h3>
-          <p>Add a new event</p>
-        </a>
-
-        <a href="{% url 'events:events_list' %}" class="profile-card-link">
-          <div class="card-icon success">
-            <i class="fa-solid fa-earth-europe"></i>
-          </div>
-          <h3>All events</h3>
-          <p>Browse available events</p>
-        </a>
-
-      {% endif %}
-
-    </div>
-
+    <form method="POST" action="{% url 'users:logout' %}" class="actions">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-ghost"><i class="fa-solid fa-arrow-right-from-bracket"></i> Log out</button>
+    </form>
   </div>
 
-</section>
-
+  <div class="link-grid">
+    {% if user.is_participant %}
+      <a href="{% url 'events:my_tickets' %}" class="card card-hover link-card"><span class="ic"><i class="fa-solid fa-ticket"></i></span><b>My tickets</b><span>QR tickets and PDF downloads</span></a>
+      <a href="{% url 'events:my_reservations' %}" class="card card-hover link-card"><span class="ic"><i class="fa-solid fa-calendar-check"></i></span><b>My reservations</b><span>Pending holds and confirmed bookings</span></a>
+      <a href="{% url 'events:events_list' %}" class="card card-hover link-card"><span class="ic"><i class="fa-solid fa-compass"></i></span><b>Discover events</b><span>See what's on</span></a>
+    {% endif %}
+    {% if user.is_organizer %}
+      <a href="{% url 'events:organizer_dashboard' %}" class="card card-hover link-card"><span class="ic"><i class="fa-solid fa-chart-line"></i></span><b>Dashboard</b><span>Revenue, sales and analytics</span></a>
+      <a href="{% url 'events:my_events' %}" class="card card-hover link-card"><span class="ic"><i class="fa-solid fa-calendar-days"></i></span><b>My events</b><span>Manage your events</span></a>
+      <a href="{% url 'events:create_event' %}" class="card card-hover link-card"><span class="ic"><i class="fa-solid fa-circle-plus"></i></span><b>Create event</b><span>Publish a new event</span></a>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}
-
-

@@ -1,174 +1,47 @@
 {% extends "base.html" %}
-{% load static %}
-
-{% block title %}About us - TicketPlatform{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/about.css' %}">
-{% endblock %}
-
+{% block title %}About - TicketPlatform{% endblock %}
 {% block content %}
-<section class="about">
-  <div class="about-hero">
-    <div class="hero-left">
-      <span class="hero-badge">Trusted event ticketing</span>
-      <h1 class="hero-title">About TicketPlatform</h1>
-      <p class="hero-subtitle">
-        TicketPlatform connects participants and organizers in one place:
-        discover events, reserve tickets, and manage event listings with ease.
-      </p>
-
-      <div class="hero-actions">
-        <a href="{% url 'events:events_list' %}" class="btn btn-primary">Browse events</a>
-        <a href="{% url 'pages:contact' %}" class="btn btn-ghost">Contact us</a>
-      </div>
-
-      <div class="stats">
-        <div class="stat">
-          <div class="stat-number">1 min</div>
-          <div class="stat-label">average setup</div>
-        </div>
-        <div class="stat">
-          <div class="stat-number">Secure</div>
-          <div class="stat-label">checkout-ready</div>
-        </div>
-        <div class="stat">
-          <div class="stat-number">24/7</div>
-          <div class="stat-label">support mindset</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="hero-right">
-      <div class="mock">
-        <div class="mock-top">
-          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-        </div>
-        <div class="mock-body">
-          <div class="mock-card">
-            <div class="mock-title">Live Jazz Night</div>
-            <div class="mock-muted">Bucharest • Friday 20:00</div>
-            <div class="mock-row">
-              <span class="pill">Standard</span>
-              <span class="pill">VIP</span>
-              <span class="pill is-accent">Early Bird</span>
-            </div>
-            <div class="mock-cta"></div>
-          </div>
-
-          <div class="mock-card is-alt">
-            <div class="mock-title">Tech Meetup</div>
-            <div class="mock-muted">Cluj • Saturday 11:00</div>
-            <div class="mock-row">
-              <span class="pill">Free</span>
-              <span class="pill is-accent">Pro</span>
-            </div>
-            <div class="mock-cta"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Features -->
-  <div class="about-card">
-    <div class="section-header">
-      <h2 class="section-title">What you get</h2>
-      <p class="section-subtitle">Built for both participants and organizers.</p>
-    </div>
-
-    <div class="about-grid">
-      <!-- Participant -->
-      <div class="feature">
-        <h3 class="feature-title is-primary">🎟️ For participants</h3>
-        <p class="feature-text">Browse events, reserve tickets, and keep everything in one account.</p>
-      </div>
-
-      <div class="feature">
-        <h3 class="feature-title">🔎 Smart discovery</h3>
-        <p class="feature-text">Search by title, location, and date — quickly find what fits your plans.</p>
-      </div>
-
-      <div class="feature">
-        <h3 class="feature-title is-success">✅ Simple reservations</h3>
-        <p class="feature-text">Clear ticket options and a smooth flow from event page to confirmation.</p>
-      </div>
-
-      <!-- Organizer -->
-      <div class="feature">
-        <h3 class="feature-title is-accent">📣 For organizers</h3>
-        <p class="feature-text">Create events, define ticket types, and monitor reservations.</p>
-      </div>
-
-      <div class="feature">
-        <h3 class="feature-title">🧾 Flexible ticketing</h3>
-        <p class="feature-text">Standard, VIP, Early Bird — pricing and quantities under your control.</p>
-      </div>
-
-      <div class="feature">
-        <h3 class="feature-title">📈 Admin-friendly management</h3>
-        <p class="feature-text">Track availability, reservations, and event status easily.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- How it works -->
-  <div class="about-card">
-    <div class="section-header">
-      <h2 class="section-title">How it works</h2>
-      <p class="section-subtitle">Two simple flows: participants and organizers.</p>
-    </div>
-
-    <div class="steps">
-      <div class="step">
-        <div class="step-icon">1</div>
-        <div>
-          <div class="step-title">Participants: discover events</div>
-          <div class="step-text">Browse the event list and open an event page for details.</div>
-        </div>
-      </div>
-
-      <div class="step">
-        <div class="step-icon">2</div>
-        <div>
-          <div class="step-title">Participants: reserve tickets</div>
-          <div class="step-text">Pick a ticket type, reserve a quantity, and keep it in your account.</div>
-        </div>
-      </div>
-
-      <div class="step">
-        <div class="step-icon">3</div>
-        <div>
-          <div class="step-title">Organizers: create an event</div>
-          <div class="step-text">Add title, date, location, image, and ticket types in minutes.</div>
-        </div>
-      </div>
-
-      <div class="step">
-        <div class="step-icon">4</div>
-        <div>
-          <div class="step-title">Organizers: manage reservations</div>
-          <div class="step-text">Track availability and reservations from your dashboard.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- CTA -->
-  <div class="about-cta-card">
-    <h2 class="cta-title">Ready to get started?</h2>
-    <p class="cta-text">Browse events as a participant or create your first event as an organizer.</p>
-
-    <div class="cta-actions">
-      <a href="{% url 'events:events_list' %}" class="btn btn-primary">Explore events</a>
-      {% if user.is_authenticated and user.is_organizer %}
-        <a href="{% url 'events:create_event' %}" class="btn btn-ghost">Create event</a>
-      {% else %}
-        <a href="{% url 'users:register' %}" class="btn btn-ghost">Create an account</a>
-      {% endif %}
+<section class="content-hero">
+  <div class="container">
+    <span class="eyebrow">About</span>
+    <h1>Ticketing that gets out of the way.</h1>
+    <p>TicketPlatform connects participants and organizers: discover events, reserve tickets, and run your event from one place.</p>
+    <div class="cta-actions" style="margin-top:28px">
+      <a href="{% url 'events:events_list' %}" class="btn btn-primary btn-lg" style="background:#fff;color:#1a0f45">Browse events</a>
+      <a href="{% url 'pages:contact' %}" class="btn btn-ghost btn-lg" style="background:rgba(255,255,255,.06);color:#fff;border-color:rgba(255,255,255,.22)">Contact us</a>
     </div>
   </div>
 </section>
+
+<section class="section"><div class="container">
+  <div class="section-head"><div><span class="eyebrow">What you get</span><h2>Built for both sides of the door</h2></div></div>
+  <div class="feature-grid-3">
+    <div class="card feature-card reveal-up"><div class="ic"><i class="fa-solid fa-ticket"></i></div><h3>For participants</h3><p>Browse events, reserve tickets and keep everything in one account.</p></div>
+    <div class="card feature-card reveal-up"><div class="ic"><i class="fa-solid fa-magnifying-glass"></i></div><h3>Smart discovery</h3><p>Search by title, location and date to find what fits your plans.</p></div>
+    <div class="card feature-card reveal-up"><div class="ic"><i class="fa-solid fa-circle-check"></i></div><h3>Simple reservations</h3><p>Clear ticket options and a smooth flow from event page to confirmation.</p></div>
+    <div class="card feature-card reveal-up"><div class="ic"><i class="fa-solid fa-bullhorn"></i></div><h3>For organizers</h3><p>Create events, define ticket types and monitor reservations.</p></div>
+    <div class="card feature-card reveal-up"><div class="ic"><i class="fa-solid fa-layer-group"></i></div><h3>Flexible ticketing</h3><p>Standard, VIP, Early Bird — pricing and quantities under your control.</p></div>
+    <div class="card feature-card reveal-up"><div class="ic"><i class="fa-solid fa-chart-line"></i></div><h3>Live management</h3><p>Track availability, revenue, reservations and check-ins at a glance.</p></div>
+  </div>
+</div></section>
+
+<section class="section" style="padding-top:0"><div class="container">
+  <div class="section-head"><div><span class="eyebrow">How it works</span><h2>Two simple flows</h2></div></div>
+  <div class="timeline">
+    <div class="card tl-step"><h3>Discover events</h3><p>Browse the list and open an event page for details.</p></div>
+    <div class="card tl-step"><h3>Reserve tickets</h3><p>Pick a ticket type and quantity, then pay securely.</p></div>
+    <div class="card tl-step"><h3>Create an event</h3><p>Add title, date, location, image and ticket types in minutes.</p></div>
+    <div class="card tl-step"><h3>Manage reservations</h3><p>Track availability and attendees from your dashboard.</p></div>
+  </div>
+</div></section>
+
+<section class="container"><div class="role-card dark" style="text-align:center">
+  <h3 style="margin-top:0">Ready to get started?</h3>
+  <p style="margin:0 auto 24px">Browse events as a participant or create your first event as an organizer.</p>
+  <div class="cta-actions" style="justify-content:center">
+    <a href="{% url 'events:events_list' %}" class="btn btn-primary">Explore events</a>
+    {% if user.is_authenticated and user.is_organizer %}<a href="{% url 'events:create_event' %}" class="btn btn-ghost">Create event</a>
+    {% else %}<a href="{% url 'users:register' %}" class="btn btn-ghost">Create an account</a>{% endif %}
+  </div>
+</div></section>
 {% endblock %}
-
-

@@ -1,51 +1,31 @@
-{% extends "base.html" %}
-{% load static %}
-
+{% extends "dashboard_base.html" %}
 {% block title %}Ticket check-in - TicketPlatform{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/ticket_management.css' %}">
-{% endblock %}
-
+{% block crumbs %}<a href="{% url 'events:ticket_management' event.id %}">{{ event.title }}</a> <i class="fa-solid fa-chevron-right" style="font-size:9px"></i> <b>Check-in</b>{% endblock %}
 {% block content %}
+<div class="card checkin-hero">
+  <span class="eyebrow">Ticket check-in</span>
+  <h1 style="font-size:26px;margin-top:8px">{{ event.title }}</h1>
 
-<section class="section-header">
-  <h1 class="section-title">🎟️ Ticket check-in</h1>
-  <p class="section-subtitle">{{ event.title }}</p>
-</section>
-
-<div class="about-card" style="max-width:480px; margin:0 auto;">
-
-  <p><strong>Attendee:</strong> {{ reservation.user.get_full_name|default:reservation.user.username }}</p>
-  <p><strong>Ticket type:</strong> {{ reservation.ticket_type.name }}</p>
-  <p><strong>Quantity:</strong> {{ reservation.quantity }}</p>
-  <p><strong>Ticket code:</strong> <span class="ticket-code">{{ reservation.ticket_code }}</span></p>
-
-  <p style="margin-top:14px;">
-    {% if not reservation.confirmed %}
-      <span class="status-pending">Not paid yet</span>
-    {% elif reservation.is_used %}
-      <span class="status-pending">Already checked in at {{ reservation.used_at|date:"d M Y, H:i" }}</span>
-    {% else %}
-      <span class="status-confirmed">Valid — not checked in yet</span>
-    {% endif %}
-  </p>
-
-  {% if reservation.confirmed and not reservation.is_used %}
-    <form method="post" style="margin-top:18px;">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-primary">Confirm entry</button>
-    </form>
-  {% elif not reservation.confirmed %}
-    <p class="section-subtitle" style="margin-top:14px;">
-      This ticket can't be checked in until the reservation is paid.
-    </p>
+  {% if not reservation.confirmed %}
+    <div class="checkin-state warn"><span class="ic"><i class="fa-solid fa-hourglass-half"></i></span><div><b>Not paid yet</b>This ticket can't be checked in until the reservation is paid.</div></div>
+  {% elif reservation.is_used %}
+    <div class="checkin-state warn"><span class="ic"><i class="fa-solid fa-triangle-exclamation"></i></span><div><b>Already checked in</b>{{ reservation.used_at|date:"d M Y, H:i" }}</div></div>
+  {% else %}
+    <div class="checkin-state ok"><span class="ic"><i class="fa-solid fa-check"></i></span><div><b>Valid ticket</b>Not checked in yet</div></div>
   {% endif %}
 
-  <div style="margin-top:18px;">
-    <a href="{% url 'events:ticket_management' event.id %}" class="btn btn-back">🔙 Back to ticket management</a>
+  <dl class="kv">
+    <dt>Attendee</dt><dd>{{ reservation.user.get_full_name|default:reservation.user.username }}</dd>
+    <dt>Ticket type</dt><dd>{{ reservation.ticket_type.name }}</dd>
+    <dt>Quantity</dt><dd>{{ reservation.quantity }}</dd>
+    <dt>Code</dt><dd class="mono">{{ reservation.ticket_code }}</dd>
+  </dl>
+
+  <div style="display:grid;gap:10px;margin-top:24px">
+    {% if reservation.confirmed and not reservation.is_used %}
+    <form method="post">{% csrf_token %}<button type="submit" class="btn btn-primary btn-lg btn-block"><i class="fa-solid fa-circle-check"></i> Confirm entry</button></form>
+    {% endif %}
+    <a href="{% url 'events:ticket_management' event.id %}" class="btn btn-ghost btn-block">Back to attendees</a>
   </div>
-
 </div>
-
 {% endblock %}

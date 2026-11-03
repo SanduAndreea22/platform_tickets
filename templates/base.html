@@ -6,105 +6,134 @@
     (function () {
       try {
         var saved = localStorage.getItem("theme");
-        if (saved === "dark" || saved === "light") {
-          document.documentElement.setAttribute("data-theme", saved);
-        }
+        if (!saved && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) saved = "dark";
+        if (saved === "dark" || saved === "light") document.documentElement.setAttribute("data-theme", saved);
       } catch (e) {}
     })();
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b1026" />
   <title>{% block title %}TicketPlatform{% endblock %}</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/site.css' %}">
   {% block extra_css %}{% endblock %}
 </head>
 
 <body>
-  <header class="site-header" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 5%;">
-    <div class="brand">
-      <a href="{% url 'pages:home' %}" class="brand-link" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
-        <img src="{% static 'events/img/logo.png' %}" alt="Logo" class="brand-logo" style="height: 40px; width: auto; object-fit: contain; margin-right: 10px;">
-        <strong class="brand-name">TicketPlatform</strong>
+  {% with current=request.resolver_match.url_name %}
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="{% url 'pages:home' %}" class="brand" aria-label="TicketPlatform home">
+        <span class="brand-mark"><i class="fa-solid fa-ticket"></i></span>
+        <span>TicketPlatform</span>
       </a>
-    </div>
 
-    <button id="menuToggle" class="icon-btn mobile-only" aria-label="Menu">
-      <i class="fas fa-bars"></i>
-    </button>
+      <nav id="navbar" class="nav" aria-label="Main">
+        <a href="{% url 'events:events_list' %}" class="nav-link{% if current == 'events_list' or current == 'event_detail' %} is-active{% endif %}">Discover</a>
+        <a href="{% url 'pages:how_it_works' %}" class="nav-link{% if current == 'how_it_works' %} is-active{% endif %}">How it works</a>
+        <a href="{% url 'pages:about' %}" class="nav-link{% if current == 'about' %} is-active{% endif %}">About</a>
+        <a href="{% url 'pages:partners' %}" class="nav-link{% if current == 'partners' %} is-active{% endif %}">Partners</a>
+        <a href="{% url 'pages:contact' %}" class="nav-link{% if current == 'contact' %} is-active{% endif %}">Contact</a>
+        {% if user.is_authenticated and user.is_participant %}
+          <a href="{% url 'events:my_tickets' %}" class="nav-link{% if current == 'my_tickets' %} is-active{% endif %}">My tickets</a>
+        {% endif %}
+        {% if user.is_authenticated and user.is_organizer %}
+          <a href="{% url 'events:organizer_dashboard' %}" class="nav-link">Organizer dashboard</a>
+        {% endif %}
+      </nav>
 
-    <nav id="navbar" class="navbar">
-      <ul id="navLinks" class="nav-links" style="display: flex; list-style: none; gap: 15px; margin: 0; padding: 0; align-items: center;">
-
-        <li><a href="{% url 'events:events_list' %}" class="nav-link">Events</a></li>
-        <li><a href="{% url 'pages:about' %}" class="nav-link">About</a></li>
-        <li><a href="{% url 'pages:contact' %}" class="nav-link">Contact</a></li>
-        <li><a href="{% url 'pages:partners' %}" class="nav-link">Partners</a></li>
-        <li><a href="{% url 'pages:terms' %}" class="nav-link">Terms</a></li>
-        <li><a href="{% url 'pages:privacy' %}" class="nav-link">Privacy Policy</a></li>
-        <li><a href="{% url 'pages:how_it_works' %}" class="nav-link">⭐ How It Works</a></li>
+      <div class="header-actions">
+        <button id="themeToggle" class="icon-btn" type="button" aria-label="Toggle light/dark theme">
+          <i class="fas fa-moon"></i>
+        </button>
 
         {% if user.is_authenticated %}
           {% if user.is_organizer %}
-            <li><a href="{% url 'events:my_events' %}" class="nav-link">📋 My Events</a></li>
-            <li><a href="{% url 'events:create_event' %}" class="nav-link nav-primary">➕ Create Event</a></li>
-          {% elif user.is_participant %}
-            <li><a href="{% url 'events:my_tickets' %}" class="nav-link">🎟️ My Tickets</a></li>
-            <li><a href="{% url 'events:my_reservations' %}" class="nav-link">📅 My Reservations</a></li>
+            <a href="{% url 'events:create_event' %}" class="btn btn-primary btn-sm hide-sm"><i class="fa-solid fa-plus"></i> Create event</a>
           {% endif %}
-
-          <li class="dropdown" id="userDropdown">
-            <button class="dropdown-btn" type="button">
-              <i class="fa fa-user"></i> {{ user.username }}
-              <i class="fa fa-chevron-down chevron"></i>
+          <div class="dropdown" id="userDropdown">
+            <button class="user-btn dropdown-btn" type="button" aria-haspopup="true">
+              <span class="avatar">{{ user.username|first|upper }}</span>
+              <span class="uname">{{ user.username }}</span>
+              <i class="fa-solid fa-chevron-down chevron"></i>
             </button>
-
             <div class="dropdown-content">
-              <a href="{% url 'users:profile' %}" class="dropdown-item">
-                <i class="fa fa-id-badge"></i> Profile
-              </a>
-              <a href="{% url 'users:logout' %}" class="dropdown-item">
-                <i class="fa fa-right-from-bracket"></i> Logout
-              </a>
+              <div class="dropdown-head">
+                <strong>{{ user.username }}</strong>
+                <span>{% if user.is_organizer %}Organizer{% else %}Participant{% endif %}</span>
+              </div>
+              {% if user.is_organizer %}
+                <a href="{% url 'events:organizer_dashboard' %}" class="dropdown-item"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+                <a href="{% url 'events:my_events' %}" class="dropdown-item"><i class="fa-solid fa-calendar-days"></i> My events</a>
+                <a href="{% url 'events:create_event' %}" class="dropdown-item"><i class="fa-solid fa-circle-plus"></i> Create event</a>
+              {% elif user.is_participant %}
+                <a href="{% url 'events:my_tickets' %}" class="dropdown-item"><i class="fa-solid fa-ticket"></i> My tickets</a>
+                <a href="{% url 'events:my_reservations' %}" class="dropdown-item"><i class="fa-solid fa-clock-rotate-left"></i> My reservations</a>
+              {% endif %}
+              <a href="{% url 'users:profile' %}" class="dropdown-item"><i class="fa-solid fa-id-badge"></i> Profile</a>
+              <a href="{% url 'users:logout' %}" class="dropdown-item"><i class="fa-solid fa-right-from-bracket"></i> Log out</a>
             </div>
-          </li>
-
+          </div>
         {% else %}
-          <li><a href="{% url 'users:login' %}" class="nav-link">Login</a></li>
-          <li><a href="{% url 'users:register' %}" class="nav-link nav-primary">Register</a></li>
+          <a href="{% url 'users:login' %}" class="btn btn-quiet btn-sm hide-sm">Log in</a>
+          <a href="{% url 'users:register' %}" class="btn btn-primary btn-sm">Get started</a>
         {% endif %}
-      </ul>
-    </nav>
 
-    <button id="themeToggle" class="icon-btn" aria-label="Toggle theme">
-      <i class="fas fa-moon"></i>
-    </button>
-  </header>
-
-  {% if messages %}
-    <div class="messages">
-      {% for message in messages %}
-        <div class="message-card">{{ message }}</div>
-      {% endfor %}
+        <button id="menuToggle" class="icon-btn mobile-only" type="button" aria-label="Menu" aria-controls="navbar">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
     </div>
-  {% endif %}
+  </header>
+  {% endwith %}
+
+  {% include "partials/messages.html" %}
 
   <main class="page">
     {% block content %}{% endblock %}
   </main>
 
+  {% block footer %}
   <footer class="site-footer">
-    <div class="footer-inner">
-      <p>&copy; 2025 TicketPlatform — All rights reserved.</p>
-      <p style="margin-top: 6px;">
-        This is a portfolio/demo project —
-        <a href="{% url 'pages:how_it_works' %}" style="color: var(--primary); font-weight: 700; text-decoration: none;">see how it works</a>.
-      </p>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <a href="{% url 'pages:home' %}" class="brand"><span class="brand-mark"><i class="fa-solid fa-ticket"></i></span><span>TicketPlatform</span></a>
+          <p>Event ticketing without the chaos — instant reservations, secure Stripe checkout and QR tickets that actually get scanned at the door.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Attend</h4>
+          <a href="{% url 'events:events_list' %}">Discover events</a>
+          <a href="{% url 'users:register' %}">Create an account</a>
+          <a href="{% url 'pages:how_it_works' %}">How it works</a>
+        </div>
+        <div class="footer-col">
+          <h4>Organize</h4>
+          <a href="{% url 'users:register' %}">Become an organizer</a>
+          <a href="{% url 'pages:partners' %}">Partners</a>
+          <a href="{% url 'pages:about' %}">About the platform</a>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <a href="{% url 'pages:contact' %}">Contact</a>
+          <a href="{% url 'pages:terms' %}">Terms</a>
+          <a href="{% url 'pages:privacy' %}">Privacy</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; {% now "Y" %} TicketPlatform. All rights reserved.</span>
+        <span>Portfolio / demo project — Stripe test mode. <a href="{% url 'pages:how_it_works' %}">See how it works →</a></span>
+      </div>
     </div>
   </footer>
+  {% endblock %}
 
   <script src="{% static 'js/base.js' %}"></script>
   {% block extra_js %}{% endblock %}

@@ -1,32 +1,20 @@
 {% extends "base.html" %}
-{% load static %}
-
 {% block title %}Partners - TicketPlatform{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/partners.css' %}">
-{% endblock %}
-
 {% block content %}
-<section class="partners">
-  <div class="partners-card">
-
-    <div class="partners-header">
-      <h1 class="partners-title">🌐 Our partners</h1>
-      <p class="partners-subtitle">Brands and organizations supporting TicketPlatform.</p>
-    </div>
-
-    <div class="partners-grid">
-      {% for partner in partners %}
-        <div class="partner-tile">
-          <img class="partner-logo" src="{{ partner.logo.url }}" alt="{{ partner.name }}">
-        </div>
-      {% empty %}
-        <p class="partners-empty">No partners available at the moment.</p>
-      {% endfor %}
-    </div>
-
+<section class="content-hero">
+  <div class="container">
+    <span class="eyebrow">Partners</span>
+    <h1>Brands and organizations behind great events.</h1>
+    <p>The people and companies supporting TicketPlatform.</p>
   </div>
 </section>
+<div class="container section">
+  <div class="event-grid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
+    {% for partner in partners %}
+      <div class="card card-pad" style="display:grid;place-items:center;min-height:120px"><img src="{{ partner.logo.url }}" alt="{{ partner.name }}" style="max-height:64px;object-fit:contain"></div>
+    {% empty %}
+      <div class="empty" style="grid-column:1/-1"><div class="ic"><i class="fa-solid fa-handshake"></i></div><h3>Partners coming soon</h3><p>Want your brand here? Get in touch.</p><a href="{% url 'pages:contact' %}" class="btn btn-primary">Become a partner</a></div>
+    {% endfor %}
+  </div>
+</div>
 {% endblock %}
-

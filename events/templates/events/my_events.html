@@ -1,46 +1,39 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}My events - TicketPlatform{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/my_events.css' %}">
-{% endblock %}
-
+{% extends 'dashboard_base.html' %}
+{% block title %}Events - Organizer - TicketPlatform{% endblock %}
+{% block crumbs %}<a href="{% url 'events:organizer_dashboard' %}">Overview</a> <i class="fa-solid fa-chevron-right" style="font-size:9px"></i> <b>Events</b>{% endblock %}
 {% block content %}
+<div class="dash-head">
+  <div><h1>Your events</h1><p>Edit, brand and track every event.</p></div>
+  <div class="actions"><a href="{% url 'events:create_event' %}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Create event</a></div>
+</div>
 
-<section class="my-events-section">
-  <h1 class="my-events-title">📋 My events</h1>
-
-  {% if events %}
-    <div class="events-grid">
-      {% for event in events %}
-        <div class="event-card">
-          {% if event.image %}
-            <img src="{{ event.image.url }}" alt="{{ event.title }}" class="event-image">
-          {% endif %}
-
-          <div class="event-content">
-            <h2 class="event-title">{{ event.title }}</h2>
-            <p class="event-location">📍 {{ event.location }}</p>
-            <p class="event-date">🗓️ {{ event.start_date|date:"d M Y H:i" }}</p>
-
-            <div class="event-actions">
-              <a href="{% url 'events:edit_event' event.id %}" class="btn edit-btn">✏️ Edit</a>
-              <a href="{% url 'events:customize_event' event.id %}" class="btn customize-btn">🎨 Customize</a>
-              <a href="{% url 'events:ticket_management' event.id %}" class="btn tickets-btn">🎟️ Tickets</a>
-            </div>
-          </div>
-        </div>
-      {% endfor %}
+{% if events %}
+<div class="ev-grid">
+  {% for event in events %}
+  <article class="card card-hover ev-card">
+    <div class="media">
+      {% if event.image %}<img src="{{ event.image.url }}" alt="">{% else %}<div class="art" style="--c: {{ event.theme_color }}"><i class="fa-solid fa-ticket"></i></div>{% endif %}
+      {% if event.is_past %}<span class="badge glass-badge no-dot">Ended</span>{% elif event.is_active %}<span class="badge badge-success badge-live">Live</span>{% else %}<span class="badge badge-primary">Upcoming</span>{% endif %}
     </div>
-
-  {% else %}
-    <div class="no-events">
-      <p>You haven’t created any events yet.</p>
-      <a href="{% url 'events:create_event' %}" class="btn create-btn">➕ Create your first event</a>
+    <div class="body">
+      <h2>{{ event.title }}</h2>
+      <div class="meta-line"><i class="fa-regular fa-calendar"></i>{{ event.start_date|date:"d M Y · H:i" }}</div>
+      <div class="meta-line"><i class="fa-solid fa-location-dot"></i>{{ event.location }}</div>
+      <div class="ev-stats">
+        <div><small>Capacity left</small><b class="tnum">{{ event.available_tickets }} / {{ event.total_capacity }}</b></div>
+        <div><small>From</small><b>{% if event.starting_price is not None %}{{ event.starting_price }} {{ CURRENCY }}{% else %}—{% endif %}</b></div>
+      </div>
+      <div class="ev-actions">
+        <a href="{% url 'events:ticket_management' event.id %}" class="btn btn-primary btn-sm"><i class="fa-solid fa-users"></i> Tickets</a>
+        <a href="{% url 'events:edit_event' event.id %}" class="btn btn-ghost btn-sm"><i class="fa-solid fa-pen"></i> Edit</a>
+        <a href="{% url 'events:customize_event' event.id %}" class="btn btn-ghost btn-sm"><i class="fa-solid fa-palette"></i> Customize</a>
+      </div>
     </div>
-  {% endif %}
-</section>
-
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty"><div class="ic"><i class="fa-solid fa-calendar-plus"></i></div><h2>No events yet</h2><p>You haven't created any events yet.</p>
+  <a href="{% url 'events:create_event' %}" class="btn btn-primary">Create your first event</a></div>
+{% endif %}
 {% endblock %}

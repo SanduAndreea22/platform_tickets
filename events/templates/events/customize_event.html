@@ -1,60 +1,35 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}Customize Event{% endblock %}
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/create_event.css' %}">
-{% endblock %}
-
+{% extends "dashboard_base.html" %}
+{% block title %}Customize event - TicketPlatform{% endblock %}
+{% block crumbs %}<a href="{% url 'events:my_events' %}">Events</a> <i class="fa-solid fa-chevron-right" style="font-size:9px"></i> <b>Branding</b>{% endblock %}
 {% block content %}
-
-<section class="create-event-section">
-  <div class="create-event-card">
-
-    <h2 class="create-event-title">🎨 Customize Your Event</h2>
-    <p class="create-event-subtitle">
-      Upload a banner, pick a theme color, and add a short promotional message.
-    </p>
-
-    <form method="post" enctype="multipart/form-data" class="create-event-form">
-      {% csrf_token %}
-
-      <div class="form-group">
-        <label>Banner image (optional)</label>
-        <input type="file" name="image" accept="image/*">
-        {% if event.image %}
-          <img src="{{ event.image.url }}" alt="Current banner" class="banner-preview">
-        {% endif %}
-        <small class="form-hint">Tip: Recommended size 1200×630 (JPG/PNG/WEBP).</small>
+<div class="dash-head"><div><h1>Customize your event</h1><p>Banner, theme color and a short promo message.</p></div></div>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  <div class="form-layout">
+    <div class="card form-card"><div class="create-form">
+      <div><label for="image">Banner image (optional)</label><input type="file" id="image" name="image" accept="image/*">
+        {% if event.image %}<img src="{{ event.image.url }}" alt="Current banner" class="banner-preview">{% endif %}
+        <span class="hint">Recommended 1200×630 (JPG/PNG/WEBP).</span></div>
+      <div><label for="theme_color">Theme color</label><input type="color" id="theme_color" name="theme_color" value="{{ event.theme_color }}"><span class="hint" style="display:block;margin-top:6px">Tints the event artwork when there's no image.</span></div>
+      <div><label for="banner_text">Banner text</label><input type="text" id="banner_text" name="banner_text" value="{{ event.banner_text|default:'' }}" placeholder="e.g., Summer starts with music!"></div>
+      <div><label for="promo_message">Promotional message</label><textarea id="promo_message" name="promo_message" rows="4">{{ event.promo_message|default:'' }}</textarea><span class="hint">Keep it short — 1–2 lines works best.</span></div>
+    </div></div>
+    <aside class="card side-card">
+      <h3>Live preview</h3>
+      <div class="preview-card">
+        {% if event.image %}<img src="{{ event.image.url }}" alt="" style="height:130px;width:100%;object-fit:cover">{% else %}<div class="art" id="prevArt" style="--c: {{ event.theme_color }}"></div>{% endif %}
+        <div class="pb"><b>{{ event.title }}</b><div class="muted" style="font-size:13px" id="prevBanner">{{ event.banner_text|default:"Your banner text" }}</div></div>
       </div>
-
-      <div class="form-group">
-        <label>Theme color</label>
-        <input type="color" name="theme_color" value="{{ event.theme_color }}" class="color-picker">
-        <small class="form-hint">This color can be used for buttons, highlights, and banners.</small>
-      </div>
-
-      <div class="form-group">
-        <label>Banner text</label>
-        <input type="text" name="banner_text" value="{{ event.banner_text }}" placeholder="e.g., Summer starts with music!">
-      </div>
-
-      <div class="form-group">
-        <label>Promotional message</label>
-        <textarea name="promo_message" rows="4">{{ event.promo_message }}</textarea>
-        <small class="form-hint">Keep it short and clear (1–2 lines works best).</small>
-      </div>
-
-      <div class="form-center">
-        <button type="submit" class="create-event-btn">Save customization</button>
-      </div>
-
-      <p class="form-note">
-        Changes will be applied to your event page immediately after saving.
-      </p>
-    </form>
-
+      <button type="submit" class="btn btn-primary btn-lg btn-block" style="margin-top:18px">Save customization</button>
+      <p class="form-note" style="margin-top:10px">Changes apply to your event page right away.</p>
+    </aside>
   </div>
-</section>
-
+</form>
+{% endblock %}
+{% block extra_js %}
+<script>
+var c = document.getElementById("theme_color"), a = document.getElementById("prevArt"), bt = document.getElementById("banner_text"), pb = document.getElementById("prevBanner");
+if (c && a) c.addEventListener("input", function () { a.style.setProperty("--c", c.value); });
+if (bt) bt.addEventListener("input", function () { pb.textContent = bt.value || "Your banner text"; });
+</script>
 {% endblock %}

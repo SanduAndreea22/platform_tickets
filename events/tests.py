@@ -348,3 +348,84 @@ class ConcurrentReservationTests(TransactionTestCase):
         self.ticket.refresh_from_db()
         self.assertEqual(self.ticket.available_quantity, 0)
         self.assertGreaterEqual(self.ticket.available_quantity, 0)
+
+
+class OrganizerDashboardTests(TestCase):
+    """Covers the redesigned organizer dashboard and that every redesigned
+    page still renders for the right role."""
+
+    def setUp(self):
+        User = get_user_model()
+        self.org = User.objects.create_user("org1", password="pw", is_organizer=True, is_participant=False)
+        self.other_org = User.objects.create_user("org2", password="pw", is_organizer=True, is_participant=False)
+        self.part = User.objects.create_user("part1", password="pw")
+        self.event = Event.objects.create(
+            organizer=self.org, title="Show", description="d", location="Cluj",
+            start_date=timezone.now() + timedelta(days=3), end_date=timezone.now() + timedelta(days=4),
+        )
+        self.ticket = TicketType.objects.create(
+            event=self.event, name="GA", price="50.00", total_quantity=10, available_quantity=7,
+        )
+        self.paid = Reservation.objects.create(user=self.part, ticket_type=self.ticket, quantity=2, confirmed=True)
+        Reservation.objects.create(user=self.part, ticket_type=self.ticket, quantity=1, confirmed=False)
+
+    def test_dashboard_requires_login(self):
+        resp = self.client.get(reverse("events:organizer_dashboard"))
+        self.assertEqual(resp.status_code, 302)
+        self.assertIn("/users/login/", resp.url)
+
+    def test_participant_cannot_open_dashboard(self):
+        self.client.force_login(self.part)
+        resp = self.client.get(reverse("events:organizer_dashboard"))
+        self.assertRedirects(resp, reverse("pages:home"), fetch_redirect_response=False)
+
+    def test_dashboard_kpis(self):
+        self.client.force_login(self.org)
+        resp = self.client.get(reverse("events:organizer_dashboard"))
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.context["revenue"], Decimal("100.00"))
+        self.assertEqual(resp.context["tickets_sold"], 2)
+        self.assertEqual(resp.context["pending_count"], 1)
+        self.assertEqual(len(resp.context["series"]), 30)
+        self.assertEqual(sum(d["tickets"] for d in resp.context["series"]), 2)
+
+    def test_dashboard_only_counts_own_events(self):
+        self.client.force_login(self.other_org)
+        resp = self.client.get(reverse("events:organizer_dashboard"))
+        self.assertEqual(resp.context["revenue"], Decimal("0"))
+        self.assertEqual(resp.context["event_count"], 0)
+
+    def test_organizer_pages_render(self):
+        self.client.force_login(self.org)
+        e = self.event.id
+        for name, args in [
+            ("events:my_events", []), ("events:create_event", []), ("events:edit_event", [e]),
+            ("events:customize_event", [e]), ("events:ticket_management", [e]),
+            ("events:ticket_checkin", [self.paid.ticket_code]),
+        ]:
+            with self.subTest(name):
+                self.assertEqual(self.client.get(reverse(name, args=args)).status_code, 200)
+
+    def test_participant_pages_render(self):
+        self.client.force_login(self.part)
+        for name, args in [
+            ("events:my_tickets", []), ("events:my_reservations", []),
+            ("events:payment_page", [self.paid.id]), ("events:payment_cancel", []),
+            ("events:event_detail", [self.event.id]), ("events:events_list", []),
+            ("users:profile", []), ("pages:home", []),
+        ]:
+            with self.subTest(name):
+                self.assertEqual(self.client.get(reverse(name, args=args)).status_code, 200)
+
+    def test_public_pages_render_anonymously(self):
+        for name in ["pages:home", "pages:about", "pages:terms", "pages:privacy", "pages:partners",
+                     "pages:how_it_works", "pages:contact", "users:login", "users:register",
+                     "users:password_reset", "events:events_list"]:
+            with self.subTest(name):
+                self.assertEqual(self.client.get(reverse(name)).status_code, 200)
+
+    def test_login_form_does_not_post_literal_none_as_next(self):
+        resp = self.client.get(reverse("users:login"))
+        self.assertNotContains(resp, 'value="None"')
+        resp = self.client.post(reverse("users:login"), {"username": "part1", "password": "pw", "next": ""})
+        self.assertRedirects(resp, reverse("users:profile"), fetch_redirect_response=False)

@@ -1,138 +1,52 @@
 {% extends 'base.html' %}
-{% load static %}
-
 {% block title %}My Tickets - TicketPlatform{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/my_tickets.css' %}">
-{% endblock %}
-
 {% block content %}
-
-<section class="tickets">
-
-  <!-- HEADER -->
-  <div class="about-card tickets-header">
-    <h1 class="section-title">🎟️ My Tickets</h1>
-    <p class="section-subtitle">
-      View all your purchased tickets in one place.
-    </p>
-  </div>
+<div class="container">
+  <header class="page-head">
+    <span class="eyebrow">Wallet</span>
+    <h1 style="margin-top:10px">My tickets</h1>
+    <p>Show the QR code at the entrance, or download the PDF.</p>
+  </header>
 
   {% if tickets %}
-    <div class="tickets-grid">
-
-      {% for ticket in tickets %}
-        <article class="ticket-card">
-
-          {% if ticket.ticket_type.event.image %}
-            <img
-              src="{{ ticket.ticket_type.event.image.url }}"
-              alt="{{ ticket.ticket_type.event.title }}"
-              class="ticket-image"
-            >
-          {% else %}
-            <div
-              class="ticket-image image-fallback"
-              style="--fallback-color: {{ ticket.ticket_type.event.theme_color }};"
-            >
-              <i class="fa-solid fa-ticket"></i>
-            </div>
-          {% endif %}
-
-          <div class="ticket-content">
-
-            <h2 class="ticket-title">
-              {{ ticket.ticket_type.event.title }}
-            </h2>
-
-            <div class="ticket-meta">
-              <span>
-                <i class="fa-solid fa-location-dot"></i>
-                {{ ticket.ticket_type.event.location }}
-              </span>
-
-              <span>
-                <i class="fa-solid fa-calendar"></i>
-                {{ ticket.ticket_type.event.start_date|date:"d M Y H:i" }}
-              </span>
-            </div>
-
-            <div class="ticket-details">
-
-              <p class="ticket-category">
-                Ticket category: <strong>{{ ticket.ticket_type.name }}</strong>
-              </p>
-
-              <div class="ticket-row">
-                <span>Quantity: <strong>{{ ticket.quantity }}</strong></span>
-                <span class="ticket-price">
-                  {{ ticket.ticket_type.price }} {{ CURRENCY }}
-                </span>
-              </div>
-
-              <div class="ticket-code">
-                <p class="ticket-code-label">Validation Code</p>
-                <div class="ticket-code-value">
-                  {{ ticket.ticket_code }}
-                </div>
-              </div>
-
-              <details class="ticket-qr-reveal">
-                <summary>🎫 Show my ticket</summary>
-                <div class="ticket-qr-panel">
-                  <img
-                    src="{% url 'events:ticket_qr_image' ticket.id %}"
-                    alt="QR code to check in at {{ ticket.ticket_type.event.title }}"
-                    class="ticket-qr-image"
-                    loading="lazy"
-                  >
-                  <p class="ticket-qr-hint">Show this at the entrance to check in.</p>
-                </div>
-              </details>
-
-              <div class="ticket-actions">
-                <a
-                  href="{% url 'events:download_ticket_pdf' ticket.id %}"
-                  class="btn btn-primary"
-                >
-                  📄 Download PDF
-                </a>
-
-                <a
-                  href="{% url 'events:event_detail' ticket.ticket_type.event.id %}"
-                  class="btn btn-ghost"
-                >
-                  🔍 View Event Details
-                </a>
-              </div>
-
-            </div>
-
-          </div>
-        </article>
-      {% endfor %}
-
-    </div>
-
-  {% else %}
-    <div class="about-cta-card tickets-empty">
-      <h2 class="section-title">No tickets yet</h2>
-      <p class="section-subtitle">
-        You don’t have any confirmed tickets yet.
-      </p>
-
-      <div class="cta-actions">
-        <a
-          href="{% url 'events:events_list' %}"
-          class="btn btn-primary"
-        >
-          🎫 Find New Events
-        </a>
+  <div class="ticket-list">
+    {% for ticket in tickets %}
+    {% with event=ticket.ticket_type.event %}
+    <article class="dticket reveal-up{% if ticket.is_used %} used{% endif %}">
+      {% if ticket.is_used %}<span class="badge badge-warning used-stamp no-dot">Checked in</span>{% endif %}
+      <div class="dticket-main">
+        <div class="head">
+          <div class="bg">{% if event.image %}<img src="{{ event.image.url }}" alt="">{% else %}<div class="art" style="--c: {{ event.theme_color }}"></div>{% endif %}</div>
+          <h2>{{ event.title }}</h2>
+        </div>
+        <div class="info">
+          <div><small>Date</small><b>{{ event.start_date|date:"D, d M Y" }}</b></div>
+          <div><small>Time</small><b>{{ event.start_date|date:"H:i" }}</b></div>
+          <div class="span2"><small>Location</small><b>{{ event.location }}</b></div>
+          <div><small>Ticket</small><b>{{ ticket.ticket_type.name }}</b></div>
+          <div><small>Quantity</small><b>{{ ticket.quantity }} × {{ ticket.ticket_type.price }} {{ CURRENCY }}</b></div>
+          <div class="span2"><small>Validation code</small><span class="code">{{ ticket.ticket_code }}</span></div>
+        </div>
+        <div class="actions">
+          <a href="{% url 'events:download_ticket_pdf' ticket.id %}" class="btn btn-primary btn-sm"><i class="fa-solid fa-file-arrow-down"></i> Download PDF</a>
+          <a href="{% url 'events:event_detail' event.id %}" class="btn btn-ghost btn-sm">Event details</a>
+        </div>
       </div>
-    </div>
+      <div class="dticket-stub">
+        <div class="qr-frame"><img src="{% url 'events:ticket_qr_image' ticket.id %}" alt="QR code to check in at {{ event.title }}" loading="lazy"></div>
+        <small>Scan at entrance</small>
+      </div>
+    </article>
+    {% endwith %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty">
+    <div class="ic"><i class="fa-solid fa-ticket"></i></div>
+    <h2>No tickets yet</h2>
+    <p>Once you've paid for a reservation, your QR tickets appear here.</p>
+    <a href="{% url 'events:events_list' %}" class="btn btn-primary">Find events</a>
+  </div>
   {% endif %}
-
-</section>
-
+</div>
 {% endblock %}
